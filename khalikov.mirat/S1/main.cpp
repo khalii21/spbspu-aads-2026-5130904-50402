@@ -12,9 +12,10 @@ void print(pair_t *res, size_t size)
   }
   std::cout << '\n';
   khalikov::List< size_t > sums;
-  while (true) {
+  bool hasNumbers = false;
+  do {
     size_t sum = 0;
-    bool hasNumbers = false;
+    hasNumbers = false;
     bool isFirst = true;
     for (size_t i = 0; i < size; ++i) {
       if (!res[i].second.isEmpty()) {
@@ -30,12 +31,12 @@ void print(pair_t *res, size_t size)
         isFirst = false;
       }
     }
-    if (!hasNumbers) {
-      break;
+    if (!isFirst) {
+      std::cout << '\n';
+      sums.pushBack(sum);
     }
-    std::cout << '\n';
-    sums.pushBack(sum);
   }
+  while (hasNumbers);
   if (sums.isEmpty() && size > 0) {
     sums.pushBack(0);
   }
@@ -79,17 +80,13 @@ std::pair< std::string, khalikov::List< size_t > > enterLine(std::istream &in)
   return {name, list};
 }
 
-template < class T > T *extend(T *arr, size_t &size, size_t &cap)
+template< class T >
+T *extend(T *arr, size_t &size, size_t &cap)
 {
-  T *res = nullptr;
   size_t newCap = cap + 5;
-  try {
-    res = new T[newCap];
-    for (size_t i = 0; i < size; i++) {
-      res[i] = arr[i];
-    }
-  } catch (const std::bad_alloc &) {
-    throw;
+  T *res = new T[newCap];
+  for (size_t i = 0; i < size; i++) {
+    res[i] = arr[i];
   }
   delete[] arr;
   cap = newCap;

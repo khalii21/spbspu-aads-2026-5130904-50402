@@ -5,11 +5,14 @@
 
 namespace khalikov
 {
-  template < class T > class List;
+  template< class T >
+  class List;
 
-  template < class T > class Node;
+  template< class T >
+  class Node;
 
-  template < class T > class LCIter
+  template< class T >
+  class LCIter
   {
     friend class List< T >;
 
@@ -33,22 +36,23 @@ namespace khalikov
   };
 }
 
-template < class T >
+template< class T >
 khalikov::LCIter< T >::LCIter():
   curr(nullptr)
 {}
 
-template < class T >
+template< class T >
 khalikov::LCIter< T >::LCIter(const Node< T > *h):
   curr(h)
 {}
 
-template < class T >
+template< class T >
 khalikov::LCIter< T >::LCIter(const LIter< T > &other):
   curr(other.curr)
 {}
 
-template < class T > const T &khalikov::LCIter< T >::operator[](size_t index) const
+template< class T >
+const T &khalikov::LCIter< T >::operator[](size_t index) const
 {
   const Node< T > *temp = curr;
   for (size_t k = 0; k < index && temp; k++) {
@@ -57,35 +61,41 @@ template < class T > const T &khalikov::LCIter< T >::operator[](size_t index) co
   return temp->val;
 }
 
-template < class T > const T &khalikov::LCIter< T >::operator*() const
+template< class T >
+const T &khalikov::LCIter< T >::operator*() const
 {
   return curr->val;
 }
 
-template < class T > const T *khalikov::LCIter< T >::operator->() const
+template< class T >
+const T *khalikov::LCIter< T >::operator->() const
 {
   return &(curr->val);
 }
 
-template < class T > khalikov::LCIter< T > &khalikov::LCIter< T >::operator++()
+template< class T >
+khalikov::LCIter< T > &khalikov::LCIter< T >::operator++()
 {
   curr = curr->next;
   return *this;
 }
 
-template < class T > khalikov::LCIter< T > khalikov::LCIter< T >::operator++(int)
+template< class T >
+khalikov::LCIter< T > khalikov::LCIter< T >::operator++(int)
 {
   LCIter< T > temp = *this;
   ++(*this);
   return temp;
 }
 
-template < class T > bool khalikov::LCIter< T >::operator==(const LCIter< T > &other) const
+template< class T >
+bool khalikov::LCIter< T >::operator==(const LCIter< T > &other) const
 {
   return curr == other.curr;
 }
 
-template < class T > bool khalikov::LCIter< T >::operator!=(const LCIter< T > &other) const
+template< class T >
+bool khalikov::LCIter< T >::operator!=(const LCIter< T > &other) const
 {
   return !(*this == other);
 }
