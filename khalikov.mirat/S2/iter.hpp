@@ -5,11 +5,14 @@
 
 namespace khalikov
 {
-  template < class T > class List;
+  template< class T >
+  class List;
 
-  template < class T > class Node;
+  template< class T >
+  class Node;
 
-  template < class T > class LIter
+  template< class T >
+  class LIter
   {
     friend class List< T >;
 
@@ -32,17 +35,18 @@ namespace khalikov
   };
 }
 
-template < class T >
+template< class T >
 khalikov::LIter< T >::LIter():
   curr(nullptr)
 {}
 
-template < class T >
+template< class T >
 khalikov::LIter< T >::LIter(Node< T > *h):
   curr(h)
 {}
 
-template < class T > T &khalikov::LIter< T >::operator[](size_t index)
+template< class T >
+T &khalikov::LIter< T >::operator[](size_t index)
 {
   Node< T > *temp = curr;
   for (size_t i = 0; i < index && temp; ++i) {
@@ -51,35 +55,41 @@ template < class T > T &khalikov::LIter< T >::operator[](size_t index)
   return temp->val;
 }
 
-template < class T > T &khalikov::LIter< T >::operator*()
+template< class T >
+T &khalikov::LIter< T >::operator*()
 {
   return curr->val;
 }
 
-template < class T > T *khalikov::LIter< T >::operator->()
+template< class T >
+T *khalikov::LIter< T >::operator->()
 {
   return &(curr->val);
 }
 
-template < class T > khalikov::LIter< T > &khalikov::LIter< T >::operator++()
+template< class T >
+khalikov::LIter< T > &khalikov::LIter< T >::operator++()
 {
   curr = curr->next;
   return *this;
 }
 
-template < class T > khalikov::LIter< T > khalikov::LIter< T >::operator++(int)
+template< class T >
+khalikov::LIter< T > khalikov::LIter< T >::operator++(int)
 {
   LIter< T > temp = *this;
   ++(*this);
   return temp;
 }
 
-template < class T > bool khalikov::LIter< T >::operator==(const LIter< T > &other) const
+template< class T >
+bool khalikov::LIter< T >::operator==(const LIter< T > &other) const
 {
   return curr == other.curr;
 }
 
-template < class T > bool khalikov::LIter< T >::operator!=(const LIter< T > &other) const
+template< class T >
+bool khalikov::LIter< T >::operator!=(const LIter< T > &other) const
 {
   return !(*this == other);
 }
