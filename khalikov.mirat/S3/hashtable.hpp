@@ -1,5 +1,7 @@
 #ifndef HASHTABLE_HPP
 #define HASHTABLE_HPP
+#include <htiter.hpp>
+#include <htciter.hpp>
 
 namespace khalikov
 {
