@@ -1,6 +1,6 @@
 #ifndef HTCITER_HPP
 #define HTCITER_HPP
-
+#include <cstddef>
 namespace khalikov
 {
   template< class Key, class Value, class Hash, class Equal >
@@ -51,7 +51,8 @@ khalikov::HTCIter< Key, Value, Hash, Equal >&
 {
    if (pos_ < table_->cap_) {
       ++pos_;
-      while (pos_ < table_->cap_ && table_->slots_[pos_].state != SlotState::OCCUPIED) {
+      while (pos_ < table_->cap_ &&
+          table_->slots_[pos_].state != HashTable< Key, Value, Hash, Equal >::SlotState::OCCUPIED) {
          ++pos_;
       }
    }
@@ -60,14 +61,14 @@ khalikov::HTCIter< Key, Value, Hash, Equal >&
 
 template< class Key, class Value, class Hash, class Equal >
 const typename khalikov::HashTable< Key, Value, Hash, Equal >::Slot&
-    khalikov::HTCIter< Key, Value, Hash, Equal >::operator*()
+    khalikov::HTCIter< Key, Value, Hash, Equal >::operator*() const
 {
   return table_->slots_[pos_];
 }
 
 template< class Key, class Value, class Hash, class Equal >
 const typename khalikov::HashTable< Key, Value, Hash, Equal >::Slot*
-    khalikov::HTCIter< Key, Value, Hash, Equal >::operator->()
+    khalikov::HTCIter< Key, Value, Hash, Equal >::operator->() const
 {
   return &table_->slots_[pos_];
 }

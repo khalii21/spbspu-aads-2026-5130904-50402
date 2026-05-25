@@ -21,7 +21,7 @@ namespace khalikov
 
 template< class T >
 khalikov::SipHash< T >::SipHash():
-  h_(seed_)
+  h_(static_cast< const void* >(seed_), 16)
 {}
 
 template < class T >

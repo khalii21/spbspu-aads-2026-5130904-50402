@@ -1,5 +1,6 @@
 #ifndef HTITER_HPP
 #define HTITER_HPP
+#include <cstddef>
 
 namespace khalikov
 {
@@ -51,7 +52,8 @@ khalikov::HTIter< Key, Value, Hash, Equal >&
 {
    if (pos_ < table_->cap_) {
       ++pos_;
-      while (pos_ < table_->cap_ && table_->slots_[pos_].state != SlotState::OCCUPIED) {
+      while (pos_ < table_->cap_ &&
+          table_->slots_[pos_].state != HashTable< Key, Value, Hash, Equal >::SlotState::OCCUPIED) {
          ++pos_;
       }
    }

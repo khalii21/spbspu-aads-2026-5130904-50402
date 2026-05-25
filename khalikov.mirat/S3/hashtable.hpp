@@ -1,7 +1,9 @@
 #ifndef HASHTABLE_HPP
 #define HASHTABLE_HPP
-#include <htiter.hpp>
-#include <htciter.hpp>
+#include "htiter.hpp"
+#include "htciter.hpp"
+#include <cstddef>
+#include <utility>
 
 namespace khalikov
 {
@@ -24,7 +26,9 @@ namespace khalikov
       Value& operator[](const Key& key);
 
       void swap(HashTable& rhs) noexcept;
-
+      size_t getSize() const noexcept;
+      size_t getCap() const noexcept;
+      bool isEmpty() const noexcept;
     private:
       void rehash(const size_t new_cap);
       struct Slot {
@@ -57,6 +61,21 @@ void khalikov::HashTable< Key, Value, Hash, Equal >::swap(HashTable& rhs) noexce
   std::swap(cap_, rhs.cap_);
   std::swap(slots_, rhs.slots_);
   std::swap(hasher, rhs.hasher);
+}
+
+template< class Key, class Value, class Hash, class Equal >
+size_t khalikov::HashTable< Key, Value, Hash, Equal >::getSize() const noexcept {
+  return size_;
+}
+
+template< class Key, class Value, class Hash, class Equal >
+size_t khalikov::HashTable< Key, Value, Hash, Equal >::getCap() const noexcept {
+  return cap_;
+}
+
+template< class Key, class Value, class Hash, class Equal >
+bool khalikov::HashTable< Key, Value, Hash, Equal >::isEmpty() const noexcept {
+  return size_ == 0;
 }
 
 template< class Key, class Value, class Hash, class Equal >
@@ -100,3 +119,5 @@ khalikov::HashTable< Key, Value, Hash, Equal >::operator=(HashTable&& rhs) noexc
    this->swap(rhs);
    return *this;
 }
+
+#endif
