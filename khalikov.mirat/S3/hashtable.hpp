@@ -16,6 +16,7 @@ namespace khalikov
   template< class Key, class Value, class Hash, class Equal >
   class HashTable {
     public:
+
       HashTable();
       HashTable(const HashTable& rhs);
       HashTable(HashTable&& rhs) noexcept;
@@ -29,13 +30,30 @@ namespace khalikov
       size_t getSize() const noexcept;
       size_t getCap() const noexcept;
       bool isEmpty() const noexcept;
-    private:
+
+      Value& at(const Key& key);
+      const Value& at(Key& key) const;
+      bool insert(const Key& key, const Value& val);
+      bool remove(const Key& key);
+
+      HTIter< Key, Value, Hash, Equal > find(const Key& key);
+      HTCIter< Key, Value, Hash, Equal > find(const Key& key) const;
+
+      HTIter< Key, Value, Hash, Equal > begin();
+	    HTCIter< Key, Value, Hash, Equal > cbegin() const;
+
+	    HTIter< Key, Value, Hash, Equal > end();
+	    HTCIter< Key, Value, Hash, Equal > cend() const;
+
+	  private:
       void rehash(const size_t new_cap);
       struct Slot {
         Key key;
         Value value;
 				SlotState state = SlotState::EMPTY;
       };
+      friend class HTIter< Key, Value, Hash, Equal>;
+      friend class HTCIter< Key, Value, Hash, Equal>;
       size_t size_;
       size_t cap_;
       Slot* slots_;
@@ -105,7 +123,7 @@ khalikov::HashTable< Key, Value, Hash, Equal >::HashTable(HashTable&& rhs) noexc
 
 template< class Key, class Value, class Hash, class Equal >
 khalikov::HashTable< Key, Value, Hash, Equal >&
-khalikov::HashTable< Key, Value, Hash, Equal >::operator=(const HashTable& rhs) {
+    khalikov::HashTable< Key, Value, Hash, Equal >::operator=(const HashTable& rhs) {
   if (this != std::addressof(rhs)) {
     HashTable temp(rhs);
     this->swap(temp);
@@ -115,9 +133,103 @@ khalikov::HashTable< Key, Value, Hash, Equal >::operator=(const HashTable& rhs) 
 
 template< class Key, class Value, class Hash, class Equal >
 khalikov::HashTable< Key, Value, Hash, Equal >&
-khalikov::HashTable< Key, Value, Hash, Equal >::operator=(HashTable&& rhs) noexcept {
-   this->swap(rhs);
-   return *this;
+    khalikov::HashTable< Key, Value, Hash, Equal >::operator=(HashTable&& rhs) noexcept {
+  this->swap(rhs);
+  return *this;
 }
+
+template< class Key, class Value, class Hash, class Equal >
+khalikov::HTIter< Key, Value, Hash, Equal >
+    khalikov::HashTable< Key, Value, Hash, Equal >::find(const Key& key) {
+  if (size_ == 0) {
+    return end();
+  }
+  size_t hash = hasher(key);
+  for (size_t i = 0; i < cap_; ++i) {
+    size_t h = (hash + i * i) % cap_;
+    if (slots_[h].state == SlotState::EMPTY) {
+      break;
+    }
+    if (slots_[h].state == SlotState::OCCUPIED && Equal{}(slots_[h].key, key)) {
+      return HTIter< Key, Value, Hash, Equal >(*this, h);
+    }
+  }
+  return end();
+}
+
+template< class Key, class Value, class Hash, class Equal >
+khalikov::HTCIter< Key, Value, Hash, Equal >
+    khalikov::HashTable< Key, Value, Hash, Equal >::find(const Key& key) const {
+  if (size_ == 0) {
+    return cend();
+  }
+  size_t hash = hasher(key);
+  for (size_t i = 0; i < cap_; ++i) {
+    size_t h = (hash + i * i) % cap_;
+    if (slots_[h].state == SlotState::EMPTY) {
+      break;
+    }
+    if (slots_[h].state == SlotState::OCCUPIED && Equal{}(slots_[h].key, key)) {
+      return HTCIter< Key, Value, Hash, Equal >(*this, h);
+    }
+  }
+  return cend();
+}
+
+template< class Key, class Value, class Hash, class Equal >
+void khalikov::HashTable< Key, Value, Hash, Equal >::rehash(size_t new_cap) {
+  Slot* new_slots = new Slot[new_cap];
+  for (size_t old_i = 0; old_i < cap_; ++old_i) {
+    if (slots_[old_i].state == SlotState::OCCUPIED) {
+      size_t hash = hasher(slots_[old_i].key);
+      for (size_t i = 0; i < new_cap; ++i) {
+        size_t h = (hash + i * i) % new_cap;
+        if (new_slots[h].state == SlotState::EMPTY) {
+          new_slots[h].key = std::move(slots_[old_i].key);
+          new_slots[h].value = std::move(slots_[old_i].value);
+          new_slots[h].state = SlotState::OCCUPIED;
+          break;
+        }
+      }
+    }
+  }
+  delete[] slots_;
+  slots_ = new_slots;
+  cap_ = new_cap;
+}
+
+template< class Key, class Value, class Hash, class Equal >
+bool khalikov::HashTable< Key, Value, Hash, Equal >::insert(const Key& key, const Value& val) {
+  if (size_ * 2 > cap_) {
+      rehash(cap_ * 2);
+  }
+  size_t hash = hasher(key);
+  size_t tomb = cap_;
+  for (size_t i = 0; i < cap_; ++i) {
+    size_t h = (hash + i * i) % cap_;
+    if (slots_[h].state == SlotState::EMPTY) {
+      if (tomb == cap_) {
+        tomb = h;
+        break;
+      }
+    }
+    if (slots_[h].state == SlotState::OCCUPIED && Equal{}(slots_[h].key, key)) {
+      slots_[h].value = val;
+      return false;
+    }
+    if (slots_[h].state == SlotState::TOMBSTONE && tomb == cap_) {
+      tomb = h;
+    }
+  }
+  if (tomb != cap_) {
+    slots_[tomb].key = key;
+    slots_[tomb].value = val;
+    slots_[tomb].state = SlotState::OCCUPIED;
+    size_++;
+    return true;
+  }
+  return false;
+}
+
 
 #endif
