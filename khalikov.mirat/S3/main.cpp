@@ -10,7 +10,7 @@
 #include "hashtable.hpp"
 #include "hasher.hpp"
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
   if (argc < 2) {
     std::cerr << "<INVALID COMMAND>\n";
@@ -23,10 +23,9 @@ int main(int argc, char* argv[])
   }
   khalikov::graphTable table = khalikov::parse(in);
   in.close();
-  using cmd_t = void (*)(std::ostream&, std::istream&, khalikov::graphTable&);
-  khalikov::HashTable< std::string, cmd_t, khalikov::SipHash< std::string >,
-      std::equal_to< std::string > > cmds;
-  cmds["graphs"]   = khalikov::graphs;
+  using cmd_t = void (*)(std::ostream &, std::istream &, khalikov::graphTable &);
+  khalikov::HashTable< std::string, cmd_t, khalikov::SipHash< std::string >, std::equal_to< std::string > > cmds;
+  cmds["graphs"] = khalikov::graphs;
   cmds["vertexes"] = khalikov::vertexes;
   cmds["outbound"] = khalikov::outbound;
   cmds["inbound"] = khalikov::inbound;
@@ -39,15 +38,13 @@ int main(int argc, char* argv[])
   while (std::cin >> cmd) {
     try {
       cmds.at(cmd)(std::cout, std::cin, table);
-    }
-    catch (...) {
+    } catch (...) {
       std::cout << "<INVALID COMMAND>\n";
       auto toignore = std::numeric_limits< std::streamsize >::max();
       std::cin.ignore(toignore, '\n');
     }
   }
-  if (!std::cin.eof())
-  {
+  if (!std::cin.eof()) {
     std::cerr << "Bad input\n";
     return 1;
   }

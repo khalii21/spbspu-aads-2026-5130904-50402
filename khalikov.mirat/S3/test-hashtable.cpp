@@ -6,7 +6,6 @@
 using namespace khalikov;
 using h_t = HashTable< int, int, SipHash< int >, std::equal_to< int > >;
 
-
 BOOST_AUTO_TEST_SUITE(HashTableTests)
 
 BOOST_AUTO_TEST_CASE(default_constructor_test)

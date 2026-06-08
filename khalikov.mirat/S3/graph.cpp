@@ -4,15 +4,18 @@
 #include <string>
 #include <utility>
 
-namespace khalikov {
+namespace khalikov
+{
 
-  void swap(Graph& gr1, Graph& gr2) noexcept {
+  void swap(Graph &gr1, Graph &gr2) noexcept
+  {
     gr1.connections.swap(gr2.connections);
     gr1.vertexes.swap(gr2.vertexes);
     gr1.pairs.swap(gr2.pairs);
   }
 
-  graphTable parse(std::istream& in) {
+  graphTable parse(std::istream &in)
+  {
     graphTable gt;
     std::string name;
     while (in >> name) {
@@ -34,26 +37,28 @@ namespace khalikov {
       graph.pairs.uniqueSort();
       graph.vertexes.uniqueSort();
       gt.insert(name, std::move(graph));
+    }
+
+    return gt;
   }
 
-  return gt;
-  }
-
-  bool contains(const List< std::string >& list, const std::string& value) {
+  bool contains(const List< std::string > &list, const std::string &value)
+  {
     if (list.isEmpty()) {
       return false;
     }
     auto it = list.cbegin();
     auto start = it;
     do {
-      if (*it == value) return true;
+      if (*it == value)
+        return true;
       ++it;
-    }
-    while (it != start);
+    } while (it != start);
     return false;
   }
 
-  void graphs(std::ostream& out, std::istream&, graphTable& table) {
+  void graphs(std::ostream &out, std::istream &, graphTable &table)
+  {
     List< std::string > names;
     for (auto it = table.begin(); it != table.end(); ++it) {
       names.pushBack(it->key);
@@ -67,11 +72,11 @@ namespace khalikov {
     do {
       out << *it << '\n';
       ++it;
-    }
-    while (it != start);
+    } while (it != start);
   }
 
-  void vertexes(std::ostream& out, std::istream& in, graphTable& table) {
+  void vertexes(std::ostream &out, std::istream &in, graphTable &table)
+  {
     std::string graph;
     in >> graph;
     auto it = table.find(graph);
@@ -87,25 +92,24 @@ namespace khalikov {
     do {
       out << *vit << '\n';
       ++vit;
-    }
-    while (vit != vstart);
+    } while (vit != vstart);
   }
 
-  void schWeights(std::ostream& out, const Graph& graph, const pairOfVertexes& key) {
-	  auto it = graph.connections.find(key);
-	  List< size_t > weights = it->value;
-	  weights.sort();
-	  auto yait = weights.cbegin();
-	  auto start = yait;
-	  do {
-	    out << " " << *yait;
-	    ++yait;
-	  }
-	  while (yait != start);
-	}
+  void schWeights(std::ostream &out, const Graph &graph, const pairOfVertexes &key)
+  {
+    auto it = graph.connections.find(key);
+    List< size_t > weights = it->value;
+    weights.sort();
+    auto yait = weights.cbegin();
+    auto start = yait;
+    do {
+      out << " " << *yait;
+      ++yait;
+    } while (yait != start);
+  }
 
-
-  void outbound(std::ostream& out, std::istream& in, graphTable& table) {
+  void outbound(std::ostream &out, std::istream &in, graphTable &table)
+  {
     std::string graph, vertex;
     in >> graph >> vertex;
     auto git = table.find(graph);
@@ -123,70 +127,69 @@ namespace khalikov {
           }
         }
         ++pit;
-      }
-      while (pit != pstart);
+      } while (pit != pstart);
       targets.sort();
-      if (targets.isEmpty()) return;
+      if (targets.isEmpty())
+        return;
 
-		  auto tit = targets.cbegin();
-		  auto tstart = tit;
-		  do {
+      auto tit = targets.cbegin();
+      auto tstart = tit;
+      do {
         out << *tit;
         schWeights(out, git->value, {vertex, *tit});
         out << '\n';
         ++tit;
-      }
-      while (tit != tstart);
-		}
+      } while (tit != tstart);
+    }
   }
 
-  void inbound(std::ostream& out, std::istream& in, graphTable& table) {
-	  std::string graph, vertex;
-	  in >> graph >> vertex;
-	  auto git = table.find(graph);
-	  if (git == table.end() || !contains(git->value.vertexes, vertex)) {
-	    throw std::runtime_error("Not found");
-	  }
-	  List< std::string > sources;
-	  if (!git->value.pairs.isEmpty()) {
-	    auto pit = git->value.pairs.cbegin();
-	    auto pstart = pit;
-	    do {
-	      if (pit->second == vertex) {
-	        if (!contains(sources, pit->first)) {
-	          sources.pushBack(pit->first);
-	        }
-	      }
-	      ++pit;
-	    }
-      while (pit != pstart);
-	    sources.sort();
-	    if (sources.isEmpty()) return;
-	    auto sit = sources.cbegin();
-	    auto sstart = sit;
-	    do {
-	      out << *sit;
-	      schWeights(out, git->value, {*sit, vertex});
-	      out << '\n';
-	      ++sit;
-	    }
-      while (sit != sstart);
-	  }
-	}
+  void inbound(std::ostream &out, std::istream &in, graphTable &table)
+  {
+    std::string graph, vertex;
+    in >> graph >> vertex;
+    auto git = table.find(graph);
+    if (git == table.end() || !contains(git->value.vertexes, vertex)) {
+      throw std::runtime_error("Not found");
+    }
+    List< std::string > sources;
+    if (!git->value.pairs.isEmpty()) {
+      auto pit = git->value.pairs.cbegin();
+      auto pstart = pit;
+      do {
+        if (pit->second == vertex) {
+          if (!contains(sources, pit->first)) {
+            sources.pushBack(pit->first);
+          }
+        }
+        ++pit;
+      } while (pit != pstart);
+      sources.sort();
+      if (sources.isEmpty())
+        return;
+      auto sit = sources.cbegin();
+      auto sstart = sit;
+      do {
+        out << *sit;
+        schWeights(out, git->value, {*sit, vertex});
+        out << '\n';
+        ++sit;
+      } while (sit != sstart);
+    }
+  }
 
-	void bind(std::ostream&, std::istream& in, graphTable& table) {
-	  std::string graph, v1, v2;
+  void bind(std::ostream &, std::istream &in, graphTable &table)
+  {
+    std::string graph, v1, v2;
     size_t weight;
     in >> graph >> v1 >> v2 >> weight;
     auto git = table.find(graph);
-	  if (git == table.end() || !contains(git->value.vertexes, v1) || !contains(git->value.vertexes, v2)) {
-	    throw std::runtime_error("Invalid input");
-	  }
+    if (git == table.end() || !contains(git->value.vertexes, v1) || !contains(git->value.vertexes, v2)) {
+      throw std::runtime_error("Invalid input");
+    }
     pairOfVertexes key = {v1, v2};
     if (git->value.connections.has(key)) {
       git->value.connections.find(key)->value.pushBack(weight);
-    }
-    else {
+    } else {
       List< size_t > weights;
       weights.pushBack(weight);
       git->value.connections.insert(key, weights);
@@ -194,7 +197,8 @@ namespace khalikov {
     }
   }
 
-  void cut(std::ostream&, std::istream& in, graphTable& table) {
+  void cut(std::ostream &, std::istream &in, graphTable &table)
+  {
     std::string graph, v1, v2;
     size_t weight;
     in >> graph >> v1 >> v2 >> weight;
@@ -203,7 +207,7 @@ namespace khalikov {
     if (git == table.end() || !git->value.connections.has(key)) {
       throw std::runtime_error("Invalid input");
     }
-    List< size_t >& weights = git->value.connections.find(key)->value;
+    List< size_t > &weights = git->value.connections.find(key)->value;
     weights.remove(weight);
     if (weights.isEmpty()) {
       git->value.connections.remove(key);
@@ -211,7 +215,8 @@ namespace khalikov {
     }
   }
 
-  void create(std::ostream&, std::istream& in, graphTable& table) {
+  void create(std::ostream &, std::istream &in, graphTable &table)
+  {
     std::string name;
     size_t count;
     in >> name >> count;
@@ -229,7 +234,8 @@ namespace khalikov {
     table.insert(name, graph);
   }
 
-  void merge(std::ostream&, std::istream& in, graphTable& table) {
+  void merge(std::ostream &, std::istream &in, graphTable &table)
+  {
     std::string res, name1, name2;
     in >> res >> name1 >> name2;
     if (table.has(res) || !table.has(name1) || !table.has(name2)) {
@@ -241,13 +247,12 @@ namespace khalikov {
     if (!g1.vertexes.isEmpty()) {
       auto it = g1.vertexes.cbegin();
       auto start = it;
-	    do {
-	      if (!contains(merged.vertexes, *it)) {
-	        merged.vertexes.pushBack(*it);
-	      }
-	      ++it;
-	    }
-	    while (it != start);
+      do {
+        if (!contains(merged.vertexes, *it)) {
+          merged.vertexes.pushBack(*it);
+        }
+        ++it;
+      } while (it != start);
     }
     if (!g2.vertexes.isEmpty()) {
       auto it = g2.vertexes.cbegin();
@@ -257,8 +262,7 @@ namespace khalikov {
           merged.vertexes.pushBack(*it);
         }
         ++it;
-      }
-      while (it != start);
+      } while (it != start);
     }
     if (!g1.pairs.isEmpty()) {
       auto it = g1.pairs.cbegin();
@@ -269,8 +273,7 @@ namespace khalikov {
         merged.connections.insert(key, w1);
         merged.pairs.pushBack(key);
         ++it;
-      }
-      while (it != start);
+      } while (it != start);
     }
     if (!g2.pairs.isEmpty()) {
       auto it = g2.pairs.cbegin();
@@ -279,27 +282,25 @@ namespace khalikov {
         pairOfVertexes key = *it;
         List< size_t > w2 = g2.connections.find(key)->value;
         if (merged.connections.has(key)) {
-          List< size_t >& temp = merged.connections.find(key)->value;
+          List< size_t > &temp = merged.connections.find(key)->value;
           auto yait = w2.cbegin();
           auto yast = yait;
           do {
             temp.pushBack(*yait);
             ++yait;
-          }
-          while (yait != yast);
-        }
-        else {
+          } while (yait != yast);
+        } else {
           merged.connections.insert(key, w2);
           merged.pairs.pushBack(key);
         }
         ++it;
-      }
-      while (it != start);
+      } while (it != start);
     }
     table.insert(res, merged);
   }
 
-  void extract(std::ostream&, std::istream& in, graphTable& table) {
+  void extract(std::ostream &, std::istream &in, graphTable &table)
+  {
     std::string res, name;
     size_t count;
     in >> res >> name >> count;
@@ -326,8 +327,7 @@ namespace khalikov {
           extracted.pairs.pushBack(key);
         }
         ++it;
-      }
-      while (it != start);
+      } while (it != start);
     }
     table.insert(res, extracted);
   }

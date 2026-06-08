@@ -3,11 +3,7 @@
 
 namespace khalikov
 {
-  enum class SlotState {
-    EMPTY,
-    OCCUPIED,
-    TOMBSTONE
-  };
+  enum class SlotState { EMPTY, OCCUPIED, TOMBSTONE };
 }
 
 #endif

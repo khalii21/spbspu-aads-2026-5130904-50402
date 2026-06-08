@@ -4,79 +4,74 @@
 #include "slotstate.hpp"
 namespace khalikov
 {
-  template< class Key, class Value, class Hash, class Equal >
-  class HashTable;
+  template < class Key, class Value, class Hash, class Equal > class HashTable;
 
-  template< class Key, class Value, class Hash, class Equal >
-  class HTCIter
+  template < class Key, class Value, class Hash, class Equal > class HTCIter
   {
-    public:
-      HTCIter(const HashTable< Key, Value, Hash, Equal >& ht, size_t pos);
-      bool operator==(const HTCIter&) const noexcept;
-      bool operator!=(const HTCIter&) const noexcept;
-      HTCIter& operator++();
-      HTCIter operator++(int);
-      const typename HashTable< Key, Value, Hash, Equal >::Slot& operator*() const;
-      const typename HashTable< Key, Value, Hash, Equal >::Slot* operator->() const;
+  public:
+    HTCIter(const HashTable< Key, Value, Hash, Equal > &ht, size_t pos);
+    bool operator==(const HTCIter &) const noexcept;
+    bool operator!=(const HTCIter &) const noexcept;
+    HTCIter &operator++();
+    HTCIter operator++(int);
+    const typename HashTable< Key, Value, Hash, Equal >::Slot &operator*() const;
+    const typename HashTable< Key, Value, Hash, Equal >::Slot *operator->() const;
 
-    private:
-      size_t pos_;
-      const HashTable< Key, Value, Hash, Equal >* table_;
+  private:
+    size_t pos_;
+    const HashTable< Key, Value, Hash, Equal > *table_;
   };
 }
 
-template< class Key, class Value, class Hash, class Equal >
-khalikov::HTCIter< Key, Value, Hash, Equal >::HTCIter(
-    const khalikov::HashTable< Key, Value, Hash, Equal >& ht, size_t pos) :
+template < class Key, class Value, class Hash, class Equal >
+khalikov::HTCIter< Key, Value, Hash, Equal >::HTCIter(const khalikov::HashTable< Key, Value, Hash, Equal > &ht,
+                                                      size_t pos):
   pos_(pos),
   table_(&ht)
 {}
 
-template< class Key, class Value, class Hash, class Equal >
+template < class Key, class Value, class Hash, class Equal >
 bool khalikov::HTCIter< Key, Value, Hash, Equal >::operator==(
-    const HTCIter< Key, Value, Hash, Equal >& rhs) const noexcept
+    const HTCIter< Key, Value, Hash, Equal > &rhs) const noexcept
 {
   return (rhs.table_ == table_ && rhs.pos_ == pos_);
 }
 
-template< class Key, class Value, class Hash, class Equal >
+template < class Key, class Value, class Hash, class Equal >
 bool khalikov::HTCIter< Key, Value, Hash, Equal >::operator!=(
-    const HTCIter< Key, Value, Hash, Equal >& rhs) const noexcept
+    const HTCIter< Key, Value, Hash, Equal > &rhs) const noexcept
 {
   return !(*this == rhs);
 }
 
-template< class Key, class Value, class Hash, class Equal >
-khalikov::HTCIter< Key, Value, Hash, Equal >&
-    khalikov::HTCIter< Key, Value, Hash, Equal >::operator++()
+template < class Key, class Value, class Hash, class Equal >
+khalikov::HTCIter< Key, Value, Hash, Equal > &khalikov::HTCIter< Key, Value, Hash, Equal >::operator++()
 {
-   if (pos_ < table_->cap_) {
+  if (pos_ < table_->cap_) {
+    ++pos_;
+    while (pos_ < table_->cap_ && table_->slots_[pos_].state != SlotState::OCCUPIED) {
       ++pos_;
-      while (pos_ < table_->cap_ &&
-          table_->slots_[pos_].state != SlotState::OCCUPIED) {
-         ++pos_;
-      }
-   }
-   return *this;
+    }
+  }
+  return *this;
 }
 
-template< class Key, class Value, class Hash, class Equal >
-const typename khalikov::HashTable< Key, Value, Hash, Equal >::Slot&
-    khalikov::HTCIter< Key, Value, Hash, Equal >::operator*() const
+template < class Key, class Value, class Hash, class Equal >
+const typename khalikov::HashTable< Key, Value, Hash, Equal >::Slot &
+khalikov::HTCIter< Key, Value, Hash, Equal >::operator*() const
 {
   return table_->slots_[pos_];
 }
 
-template< class Key, class Value, class Hash, class Equal >
-const typename khalikov::HashTable< Key, Value, Hash, Equal >::Slot*
-    khalikov::HTCIter< Key, Value, Hash, Equal >::operator->() const
+template < class Key, class Value, class Hash, class Equal >
+const typename khalikov::HashTable< Key, Value, Hash, Equal >::Slot *
+khalikov::HTCIter< Key, Value, Hash, Equal >::operator->() const
 {
   return &table_->slots_[pos_];
 }
 
-template< class Key, class Value, class Hash, class Equal >
-khalikov::HTCIter< Key, Value, Hash, Equal >
-    khalikov::HTCIter< Key, Value, Hash, Equal >::operator++(int)
+template < class Key, class Value, class Hash, class Equal >
+khalikov::HTCIter< Key, Value, Hash, Equal > khalikov::HTCIter< Key, Value, Hash, Equal >::operator++(int)
 {
   HTCIter temp = *this;
   ++(*this);
