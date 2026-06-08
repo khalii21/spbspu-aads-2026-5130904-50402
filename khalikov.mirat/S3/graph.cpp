@@ -231,7 +231,7 @@ namespace khalikov
     std::string name;
     size_t count;
     if (!(in >> name >> count)) {
-      out << "<INVALID COMMAND\n>";
+      out << "<INVALID COMMAND>\n";
       in.clear();
       std::string garbage;
       std::getline(in, garbage);
