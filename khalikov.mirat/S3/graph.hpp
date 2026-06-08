@@ -1,7 +1,7 @@
 #ifndef GRAPH_HPP
 #define GRAPH_HPP
 
-#include <list.hpp>
+#include "../S1/list.hpp"
 #include <functional>
 #include <istream>
 #include <ostream>
@@ -15,10 +15,16 @@ namespace khalikov {
   struct Graph {
     HashTable< pairOfVertexes, List< size_t >, SipHash< pairOfVertexes >, std::equal_to< pairOfVertexes > >
         connections;
+    List< std::string > vertexes;
+    List< pairOfVertexes > pairs;
   };
-  void swap(Graph& gr1, Graph& gr2);
+
+  void swap(Graph& gr1, Graph& gr2) noexcept;
 
   using graphTable = HashTable< std::string, Graph, SipHash< std::string >, std::equal_to< std::string > >;
+
+  graphTable parse(std::istream& in);
+  bool contains(const List< std::string >& list, const std::string& v);
 
   void graphs(std::ostream& out, std::istream& in, graphTable& table);
   void vertexes(std::ostream& out, std::istream& in, graphTable& table);
