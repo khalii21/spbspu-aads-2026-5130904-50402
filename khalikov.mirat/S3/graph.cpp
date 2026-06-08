@@ -183,8 +183,14 @@ namespace khalikov
     size_t weight;
     in >> graph >> v1 >> v2 >> weight;
     auto git = table.find(graph);
-    if (git == table.end() || !contains(git->value.vertexes, v1) || !contains(git->value.vertexes, v2)) {
+    if (git == table.end()) {
       throw std::runtime_error("Invalid input");
+    }
+    if (!contains(git->value.vertexes, v1)) {
+      git->value.vertexes.pushBack(v1);
+    }
+    if (!contains(git->value.vertexes, v2)) {
+      git->value.vertexes.pushBack(v2);
     }
     pairOfVertexes key = {v1, v2};
     if (git->value.connections.has(key)) {
