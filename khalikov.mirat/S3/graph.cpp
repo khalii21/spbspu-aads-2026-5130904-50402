@@ -135,9 +135,10 @@ namespace khalikov
         ++pit;
       } while (pit != pstart);
       targets.sort();
-      if (targets.isEmpty())
+      if (targets.isEmpty()) {
+        out << '\n';
         return;
-
+      }
       auto tit = targets.cbegin();
       auto tstart = tit;
       do {
@@ -170,8 +171,10 @@ namespace khalikov
         ++pit;
       } while (pit != pstart);
       sources.sort();
-      if (sources.isEmpty())
+      if (sources.isEmpty()) {
+        out << '\n';
         return;
+      }
       auto sit = sources.cbegin();
       auto sstart = sit;
       do {
