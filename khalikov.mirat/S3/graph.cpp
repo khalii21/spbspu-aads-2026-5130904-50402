@@ -236,15 +236,27 @@ namespace khalikov
   void create(std::ostream &, std::istream &in, graphTable &table)
   {
     std::string name;
-    size_t count;
-    if (!(in >> name >> count)) {
+    if (!(in >> name)) {
+      throw std::runtime_error("Invalid input");
+    }
+    while (in.peek() == ' ' || in.peek() == '\t') {
+      in.get();
+    }
+    if (in.peek() == '\n' || in.peek() == EOF || !std::isdigit(in.peek())) {
+      throw std::runtime_error("Invalid input");
+    }
+    size_t count = 0;
+    if (!(in >> count)) {
       in.clear();
       throw std::runtime_error("Invalid input");
     }
     Graph graph;
     for (size_t i = 0; i < count; ++i) {
       std::string vertex;
-      in >> vertex;
+      if (!(in >> vertex)) {
+        in.clear();
+        throw std::runtime_error("Invalid input");
+      }
       if (!contains(graph.vertexes, vertex)) {
         graph.vertexes.pushBack(vertex);
       }
@@ -252,7 +264,7 @@ namespace khalikov
     if (table.has(name)) {
       throw std::runtime_error("Already exist");
     }
-    table.insert(name, graph);
+    table.insert(name, std::move(graph));
   }
 
   void merge(std::ostream &, std::istream &in, graphTable &table)
