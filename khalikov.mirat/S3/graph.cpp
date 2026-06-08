@@ -59,6 +59,10 @@ namespace khalikov
 
   void graphs(std::ostream &out, std::istream &, graphTable &table)
   {
+    if (table.isEmpty()) {
+      out << '\n';
+      return;
+    }
     List< std::string > names;
     for (auto it = table.begin(); it != table.end(); ++it) {
       names.pushBack(it->key);
@@ -85,6 +89,7 @@ namespace khalikov
     }
     List< std::string > vxs = it->value.vertexes;
     if (vxs.isEmpty()) {
+      out << '\n';
       return;
     }
     auto vit = vxs.cbegin();
@@ -225,7 +230,13 @@ namespace khalikov
   {
     std::string name;
     size_t count;
-    in >> name >> count;
+    if (!(in >> name >> count)) {
+      out << "<INVALID COMMAND\n>";
+      in.clear();
+      std::string garbage;
+      std::getline(in, garbage);
+      return;
+    }
     if (table.has(name)) {
       throw std::runtime_error("Already exist");
     }
