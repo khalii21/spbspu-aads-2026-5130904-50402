@@ -25,7 +25,9 @@ namespace khalikov
   using graphTable = HashTable< std::string, Graph, SipHash< std::string >, std::equal_to< std::string > >;
 
   graphTable parse(std::istream &in);
-  bool contains(const List< std::string > &list, const std::string &v);
+
+  template< class T >
+  bool contains(const List< T > &list, const T &v);
 
   void graphs(std::ostream &out, std::istream &in, graphTable &table);
   void vertexes(std::ostream &out, std::istream &in, graphTable &table);

@@ -42,7 +42,8 @@ namespace khalikov
     return gt;
   }
 
-  bool contains(const List< std::string > &list, const std::string &value)
+  template< class T >
+  bool contains(const List< T > &list, const T &value)
   {
     if (list.isEmpty()) {
       return false;
@@ -212,13 +213,19 @@ namespace khalikov
   {
     std::string graph, v1, v2;
     size_t weight;
-    in >> graph >> v1 >> v2 >> weight;
+    if (!(in >> graph >> v1 >> v2 >> weight)) {
+      in.clear();
+      throw std::runtime_error("Invalid input");
+    }
     auto git = table.find(graph);
     pairOfVertexes key = {v1, v2};
     if (git == table.end() || !git->value.connections.has(key)) {
       throw std::runtime_error("Invalid input");
     }
     List< size_t > &weights = git->value.connections.find(key)->value;
+    if (!contains(weights, weight)) {
+      throw std::runtime_error("Invalid input");
+    }
     weights.remove(weight);
     if (weights.isEmpty()) {
       git->value.connections.remove(key);
@@ -226,19 +233,13 @@ namespace khalikov
     }
   }
 
-  void create(std::ostream &out, std::istream &in, graphTable &table)
+  void create(std::ostream &, std::istream &in, graphTable &table)
   {
     std::string name;
     size_t count;
     if (!(in >> name >> count)) {
-      out << "<INVALID COMMAND>\n";
       in.clear();
-      std::string garbage;
-      std::getline(in, garbage);
-      return;
-    }
-    if (table.has(name)) {
-      throw std::runtime_error("Already exist");
+      throw std::runtime_error("Invalid input");
     }
     Graph graph;
     for (size_t i = 0; i < count; ++i) {
@@ -248,13 +249,19 @@ namespace khalikov
         graph.vertexes.pushBack(vertex);
       }
     }
+    if (table.has(name)) {
+      throw std::runtime_error("Already exist");
+    }
     table.insert(name, graph);
   }
 
   void merge(std::ostream &, std::istream &in, graphTable &table)
   {
     std::string res, name1, name2;
-    in >> res >> name1 >> name2;
+    if (!(in >> res >> name1 >> name2)) {
+      in.clear();
+      throw std::runtime_error("Invalid input");
+    }
     if (table.has(res) || !table.has(name1) || !table.has(name2)) {
       throw std::runtime_error("Invalid input");
     }
@@ -320,7 +327,10 @@ namespace khalikov
   {
     std::string res, name;
     size_t count;
-    in >> res >> name >> count;
+    if (!(in >> res >> name >> count)) {
+      in.clear();
+      throw std::runtime_error("Invalid input");
+    }
     if (table.has(res) || !table.has(name)) {
       throw std::runtime_error("Invalid input");
     }
