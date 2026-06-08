@@ -210,4 +210,125 @@ namespace khalikov {
       git->value.pairs.remove(key);
     }
   }
+
+  void create(std::ostream&, std::istream& in, graphTable& table) {
+    std::string name;
+    size_t count;
+    in >> name >> count;
+    if (table.has(name)) {
+      throw std::runtime_error("Already exist");
+    }
+    Graph graph;
+    for (size_t i = 0; i < count; ++i) {
+      std::string vertex;
+      in >> vertex;
+      if (!contains(graph.vertexes, vertex)) {
+        graph.vertexes.pushBack(vertex);
+      }
+    }
+    table.insert(name, graph);
+  }
+
+  void merge(std::ostream&, std::istream& in, graphTable& table) {
+    std::string res, name1, name2;
+    in >> res >> name1 >> name2;
+    if (table.has(res) || !table.has(name1) || !table.has(name2)) {
+      throw std::runtime_error("Invalid input");
+    }
+    Graph merged;
+    Graph g1 = table.find(name1)->value;
+    Graph g2 = table.find(name2)->value;
+    if (!g1.vertexes.isEmpty()) {
+      auto it = g1.vertexes.cbegin();
+      auto start = it;
+	    do {
+	      if (!contains(merged.vertexes, *it)) {
+	        merged.vertexes.pushBack(*it);
+	      }
+	      ++it;
+	    }
+	    while (it != start);
+    }
+    if (!g2.vertexes.isEmpty()) {
+      auto it = g2.vertexes.cbegin();
+      auto start = it;
+      do {
+        if (!contains(merged.vertexes, *it)) {
+          merged.vertexes.pushBack(*it);
+        }
+        ++it;
+      }
+      while (it != start);
+    }
+    if (!g1.pairs.isEmpty()) {
+      auto it = g1.pairs.cbegin();
+      auto start = it;
+      do {
+        pairOfVertexes key = *it;
+        List< size_t > w1 = g1.connections.find(key)->value;
+        merged.connections.insert(key, w1);
+        merged.pairs.pushBack(key);
+        ++it;
+      }
+      while (it != start);
+    }
+    if (!g2.pairs.isEmpty()) {
+      auto it = g2.pairs.cbegin();
+      auto start = it;
+      do {
+        pairOfVertexes key = *it;
+        List< size_t > w2 = g2.connections.find(key)->value;
+        if (merged.connections.has(key)) {
+          List< size_t >& temp = merged.connections.find(key)->value;
+          auto yait = w2.cbegin();
+          auto yast = yait;
+          do {
+            temp.pushBack(*yait);
+            ++yait;
+          }
+          while (yait != yast);
+        }
+        else {
+          merged.connections.insert(key, w2);
+          merged.pairs.pushBack(key);
+        }
+        ++it;
+      }
+      while (it != start);
+    }
+    table.insert(res, merged);
+  }
+
+  void extract(std::ostream&, std::istream& in, graphTable& table) {
+    std::string res, name;
+    size_t count;
+    in >> res >> name >> count;
+    if (table.has(res) || !table.has(name)) {
+      throw std::runtime_error("Invalid input");
+    }
+    Graph extracted;
+    Graph graph = table.find(name)->value;
+    for (size_t i = 0; i < count; ++i) {
+      std::string v;
+      in >> v;
+      if (contains(graph.vertexes, v) && !contains(extracted.vertexes, v)) {
+        extracted.vertexes.pushBack(v);
+      }
+    }
+    if (!graph.pairs.isEmpty()) {
+      auto it = graph.pairs.cbegin();
+      auto start = it;
+      do {
+        pairOfVertexes key = *it;
+        if (contains(extracted.vertexes, key.first) && contains(extracted.vertexes, key.second)) {
+          List< size_t > weights = graph.connections.find(key)->value;
+          extracted.connections.insert(key, weights);
+          extracted.pairs.pushBack(key);
+        }
+        ++it;
+      }
+      while (it != start);
+    }
+    table.insert(res, extracted);
+  }
 }

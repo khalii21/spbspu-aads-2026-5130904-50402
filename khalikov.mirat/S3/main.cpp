@@ -10,8 +10,6 @@
 #include "hashtable.hpp"
 #include "hasher.hpp"
 
-
-
 int main(int argc, char* argv[])
 {
   if (argc < 2) {
@@ -34,6 +32,9 @@ int main(int argc, char* argv[])
   cmds["inbound"] = khalikov::inbound;
   cmds["bind"] = khalikov::bind;
   cmds["cut"] = khalikov::cut;
+  cmds["create"] = khalikov::create;
+  cmds["merge"] = khalikov::merge;
+  cmds["extract"] = khalikov::extract;
   std::string cmd;
   while (std::cin >> cmd) {
     try {
