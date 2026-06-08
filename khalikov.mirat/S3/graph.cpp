@@ -226,7 +226,7 @@ namespace khalikov
     }
   }
 
-  void create(std::ostream &, std::istream &in, graphTable &table)
+  void create(std::ostream &out, std::istream &in, graphTable &table)
   {
     std::string name;
     size_t count;
