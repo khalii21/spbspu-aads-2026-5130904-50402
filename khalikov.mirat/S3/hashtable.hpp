@@ -2,17 +2,13 @@
 #define HASHTABLE_HPP
 #include "htiter.hpp"
 #include "htciter.hpp"
+#include "slotstate.hpp"
 #include <cstddef>
 #include <utility>
+#include <stdexcept>
 
 namespace khalikov
 {
-  enum class SlotState {
-    EMPTY,
-    OCCUPIED,
-    TOMBSTONE
-  };
-
   template< class Key, class Value, class Hash, class Equal >
   class HashTable {
     public:
@@ -32,7 +28,7 @@ namespace khalikov
       bool isEmpty() const noexcept;
 
       Value& at(const Key& key);
-      const Value& at(Key& key) const;
+      const Value& at(const Key& key) const;
       bool insert(const Key& key, const Value& val);
       bool remove(const Key& key);
 
@@ -139,6 +135,36 @@ khalikov::HashTable< Key, Value, Hash, Equal >&
 }
 
 template< class Key, class Value, class Hash, class Equal >
+khalikov::HTIter< Key, Value, Hash, Equal > khalikov::HashTable< Key, Value, Hash, Equal >::begin() {
+  for (size_t i = 0; i < cap_; ++i) {
+    if (slots_[i].state == SlotState::OCCUPIED) {
+      return HTIter< Key, Value, Hash, Equal >(*this, i);
+    }
+  }
+  return end();
+}
+
+template< class Key, class Value, class Hash, class Equal >
+khalikov::HTIter< Key, Value, Hash, Equal > khalikov::HashTable< Key, Value, Hash, Equal >::end() {
+   return HTIter< Key, Value, Hash, Equal >(*this, cap_);
+}
+
+template< class Key, class Value, class Hash, class Equal >
+khalikov::HTCIter< Key, Value, Hash, Equal > khalikov::HashTable< Key, Value, Hash, Equal >::cbegin() const {
+  for (size_t i = 0; i < cap_; ++i) {
+    if (slots_[i].state == SlotState::OCCUPIED) {
+      return HTCIter< Key, Value, Hash, Equal >(*this, i);
+    }
+  }
+  return cend();
+}
+
+template< class Key, class Value, class Hash, class Equal >
+khalikov::HTCIter< Key, Value, Hash, Equal > khalikov::HashTable< Key, Value, Hash, Equal >::cend() const {
+   return HTCIter< Key, Value, Hash, Equal >(*this, cap_);
+}
+
+template< class Key, class Value, class Hash, class Equal >
 khalikov::HTIter< Key, Value, Hash, Equal >
     khalikov::HashTable< Key, Value, Hash, Equal >::find(const Key& key) {
   if (size_ == 0) {
@@ -210,8 +236,8 @@ bool khalikov::HashTable< Key, Value, Hash, Equal >::insert(const Key& key, cons
     if (slots_[h].state == SlotState::EMPTY) {
       if (tomb == cap_) {
         tomb = h;
-        break;
       }
+      break;
     }
     if (slots_[h].state == SlotState::OCCUPIED && Equal{}(slots_[h].key, key)) {
       slots_[h].value = val;
@@ -231,5 +257,49 @@ bool khalikov::HashTable< Key, Value, Hash, Equal >::insert(const Key& key, cons
   return false;
 }
 
+template< class Key, class Value, class Hash, class Equal >
+Value& khalikov::HashTable< Key, Value, Hash, Equal >::at(const Key& key) {
+  auto it = find(key);
+  if (it == end()) {
+    throw std::out_of_range("Key not found");
+  }
+  return it->value;
+}
+
+template< class Key, class Value, class Hash, class Equal >
+const Value& khalikov::HashTable< Key, Value, Hash, Equal >::at(const Key& key) const {
+  auto it = find(key);
+  if (it == cend()) {
+    throw std::out_of_range("Key not found");
+  }
+  return it->value;
+}
+
+template< class Key, class Value, class Hash, class Equal >
+Value& khalikov::HashTable< Key, Value, Hash, Equal >::operator[](const Key& key) {
+  auto it = find(key);
+  if (it == end()) {
+    insert(key, Value{});
+    return find(key)->value;
+  }
+  return it->value;
+}
+
+template< class Key, class Value, class Hash, class Equal >
+bool khalikov::HashTable< Key, Value, Hash, Equal >::remove(const Key& key) {
+  size_t hash = hasher(key);
+  for (size_t i = 0; i < cap_; ++i) {
+    size_t h = (hash + i * i) % cap_;
+    if (slots_[h].state == SlotState::EMPTY) {
+      return false;
+    }
+    if (slots_[h].state == SlotState::OCCUPIED && Equal{}(slots_[h].key, key)) {
+      slots_[h].state = SlotState::TOMBSTONE;
+      size_--;
+      return true;
+    }
+  }
+  return false;
+}
 
 #endif
