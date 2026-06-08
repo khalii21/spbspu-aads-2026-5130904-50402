@@ -31,6 +31,7 @@ namespace khalikov
       const Value& at(const Key& key) const;
       bool insert(const Key& key, const Value& val);
       bool remove(const Key& key);
+      bool has(const Key& key) const;
 
       HTIter< Key, Value, Hash, Equal > find(const Key& key);
       HTCIter< Key, Value, Hash, Equal > find(const Key& key) const;
@@ -301,5 +302,11 @@ bool khalikov::HashTable< Key, Value, Hash, Equal >::remove(const Key& key) {
   }
   return false;
 }
+
+template< class Key, class Value, class Hash, class Equal >
+bool khalikov::HashTable< Key, Value, Hash, Equal >::has(const Key& key) const {
+  return find(key) != cend();
+}
+
 
 #endif

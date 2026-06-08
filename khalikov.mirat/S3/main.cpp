@@ -31,6 +31,9 @@ int main(int argc, char* argv[])
   cmds["graphs"]   = khalikov::graphs;
   cmds["vertexes"] = khalikov::vertexes;
   cmds["outbound"] = khalikov::outbound;
+  cmds["inbound"] = khalikov::inbound;
+  cmds["bind"] = khalikov::bind;
+  cmds["cut"] = khalikov::cut;
   std::string cmd;
   while (std::cin >> cmd) {
     try {

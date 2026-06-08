@@ -91,6 +91,20 @@ namespace khalikov {
     while (vit != vstart);
   }
 
+  void schWeights(std::ostream& out, const Graph& graph, const pairOfVertexes& key) {
+	  auto it = graph.connections.find(key);
+	  List< size_t > weights = it->value;
+	  weights.sort();
+	  auto yait = weights.cbegin();
+	  auto start = yait;
+	  do {
+	    out << " " << *yait;
+	    ++yait;
+	  }
+	  while (yait != start);
+	}
+
+
   void outbound(std::ostream& out, std::istream& in, graphTable& table) {
     std::string graph, vertex;
     in >> graph >> vertex;
@@ -117,21 +131,83 @@ namespace khalikov {
 		  auto tit = targets.cbegin();
 		  auto tstart = tit;
 		  do {
-		    std::string tov = *tit;
-		    out << tov;
-		    auto eit = git->value.connections.find({vertex, tov});
-		    List< size_t > weights = eit->value;
-		    weights.sort();
-		    auto wit = weights.cbegin();
-		    auto wstart = wit;
-		    do {
-		      out << " " << *wit;
-		      ++wit;
-		    } while (wit != wstart);
-		    out << "\n";
-		    ++tit;
-		  }
+        out << *tit;
+        schWeights(out, git->value, {vertex, *tit});
+        out << '\n';
+        ++tit;
+      }
       while (tit != tstart);
 		}
+  }
+
+  void inbound(std::ostream& out, std::istream& in, graphTable& table) {
+	  std::string graph, vertex;
+	  in >> graph >> vertex;
+	  auto git = table.find(graph);
+	  if (git == table.end() || !contains(git->value.vertexes, vertex)) {
+	    throw std::runtime_error("Not found");
+	  }
+	  List< std::string > sources;
+	  if (!git->value.pairs.isEmpty()) {
+	    auto pit = git->value.pairs.cbegin();
+	    auto pstart = pit;
+	    do {
+	      if (pit->second == vertex) {
+	        if (!contains(sources, pit->first)) {
+	          sources.pushBack(pit->first);
+	        }
+	      }
+	      ++pit;
+	    }
+      while (pit != pstart);
+	    sources.sort();
+	    if (sources.isEmpty()) return;
+	    auto sit = sources.cbegin();
+	    auto sstart = sit;
+	    do {
+	      out << *sit;
+	      schWeights(out, git->value, {*sit, vertex});
+	      out << '\n';
+	      ++sit;
+	    }
+      while (sit != sstart);
+	  }
+	}
+
+	void bind(std::ostream&, std::istream& in, graphTable& table) {
+	  std::string graph, v1, v2;
+    size_t weight;
+    in >> graph >> v1 >> v2 >> weight;
+    auto git = table.find(graph);
+	  if (git == table.end() || !contains(git->value.vertexes, v1) || !contains(git->value.vertexes, v2)) {
+	    throw std::runtime_error("Invalid input");
+	  }
+    pairOfVertexes key = {v1, v2};
+    if (git->value.connections.has(key)) {
+      git->value.connections.find(key)->value.pushBack(weight);
+    }
+    else {
+      List< size_t > weights;
+      weights.pushBack(weight);
+      git->value.connections.insert(key, weights);
+      git->value.pairs.pushBack(key);
+    }
+  }
+
+  void cut(std::ostream&, std::istream& in, graphTable& table) {
+    std::string graph, v1, v2;
+    size_t weight;
+    in >> graph >> v1 >> v2 >> weight;
+    auto git = table.find(graph);
+    pairOfVertexes key = {v1, v2};
+    if (git == table.end() || !git->value.connections.has(key)) {
+      throw std::runtime_error("Invalid input");
+    }
+    List< size_t >& weights = git->value.connections.find(key)->value;
+    weights.remove(weight);
+    if (weights.isEmpty()) {
+      git->value.connections.remove(key);
+      git->value.pairs.remove(key);
+    }
   }
 }
