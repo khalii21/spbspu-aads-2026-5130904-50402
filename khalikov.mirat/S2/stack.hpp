@@ -5,8 +5,7 @@
 
 namespace khalikov
 {
-  template< class T >
-  class Stack
+  template < class T > class Stack
   {
   private:
     List< T > list;
@@ -22,20 +21,17 @@ namespace khalikov
   };
 }
 
-template< class T >
-void khalikov::Stack< T >::push(const T &rhs)
+template < class T > void khalikov::Stack< T >::push(const T &rhs)
 {
   list.pushFront(rhs);
 }
 
-template< class T >
-void khalikov::Stack< T >::push(const T &&rhs)
+template < class T > void khalikov::Stack< T >::push(const T &&rhs)
 {
   list.pushFront(std::move(rhs));
 }
 
-template< class T >
-void khalikov::Stack< T >::pop()
+template < class T > void khalikov::Stack< T >::pop()
 {
   if (empty()) {
     throw std::logic_error("Stack is empty");
@@ -43,8 +39,7 @@ void khalikov::Stack< T >::pop()
   list.popFront();
 }
 
-template< class T >
-const T &khalikov::Stack< T >::top() const
+template < class T > const T &khalikov::Stack< T >::top() const
 {
   if (empty()) {
     throw std::logic_error("Stack is empty");
@@ -53,8 +48,7 @@ const T &khalikov::Stack< T >::top() const
   return *it;
 }
 
-template< class T >
-T &khalikov::Stack< T >::top()
+template < class T > T &khalikov::Stack< T >::top()
 {
   if (empty()) {
     throw std::logic_error("Stack is empty");
@@ -63,15 +57,12 @@ T &khalikov::Stack< T >::top()
   return *it;
 }
 
-
-template< class T >
-size_t khalikov::Stack< T >::size() const noexcept
+template < class T > size_t khalikov::Stack< T >::size() const noexcept
 {
   return list.size();
 }
 
-template< class T >
-bool khalikov::Stack< T >::empty() const noexcept
+template < class T > bool khalikov::Stack< T >::empty() const noexcept
 {
   return list.isEmpty();
 }

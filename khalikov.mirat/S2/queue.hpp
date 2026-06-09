@@ -5,8 +5,7 @@
 
 namespace khalikov
 {
-  template< class T >
-  class Queue
+  template < class T > class Queue
   {
   private:
     List< T > list;
@@ -25,8 +24,7 @@ namespace khalikov
   };
 }
 
-template< class T >
-const T &khalikov::Queue< T >::back() const
+template < class T > const T &khalikov::Queue< T >::back() const
 {
   if (empty()) {
     throw std::logic_error("Queue is empty");
@@ -38,8 +36,7 @@ const T &khalikov::Queue< T >::back() const
   return *it;
 }
 
-template< class T >
-T &khalikov::Queue< T >::back()
+template < class T > T &khalikov::Queue< T >::back()
 {
   if (empty()) {
     throw std::logic_error("Queue is empty");
@@ -51,9 +48,7 @@ T &khalikov::Queue< T >::back()
   return *it;
 }
 
-
-template< class T >
-const T &khalikov::Queue< T >::front() const
+template < class T > const T &khalikov::Queue< T >::front() const
 {
   if (empty()) {
     throw std::logic_error("Queue is empty");
@@ -61,8 +56,7 @@ const T &khalikov::Queue< T >::front() const
   return *list.cbegin();
 }
 
-template< class T >
-T &khalikov::Queue< T >::front()
+template < class T > T &khalikov::Queue< T >::front()
 {
   if (empty()) {
     throw std::logic_error("Queue is empty");
@@ -70,21 +64,17 @@ T &khalikov::Queue< T >::front()
   return *list.begin();
 }
 
-
-template< class T >
-void khalikov::Queue< T >::push(const T &rhs)
+template < class T > void khalikov::Queue< T >::push(const T &rhs)
 {
   list.pushBack(rhs);
 }
 
-template< class T >
-void khalikov::Queue< T >::push(const T &&rhs)
+template < class T > void khalikov::Queue< T >::push(const T &&rhs)
 {
   list.pushBack(std::move(rhs));
 }
 
-template< class T >
-void khalikov::Queue< T >::pop()
+template < class T > void khalikov::Queue< T >::pop()
 {
   if (empty()) {
     throw std::logic_error("Queue is empty");
@@ -92,20 +82,17 @@ void khalikov::Queue< T >::pop()
   list.popFront();
 }
 
-template< class T >
-bool khalikov::Queue< T >::empty() const noexcept
+template < class T > bool khalikov::Queue< T >::empty() const noexcept
 {
   return list.isEmpty();
 }
 
-template< class T >
-size_t khalikov::Queue< T >::size() const noexcept
+template < class T > size_t khalikov::Queue< T >::size() const noexcept
 {
   return list.size();
 }
 
-template< class T >
-void khalikov::Queue< T >::swap(Queue &rhs) noexcept
+template < class T > void khalikov::Queue< T >::swap(Queue &rhs) noexcept
 {
   list.swap(rhs.list);
 }

@@ -26,16 +26,14 @@ long long op(const long long val1, const long long val2, const std::string &oper
     if (!val1 || !val2) {
       res = 0;
     } else {
-	    if ((val1 > 0 && val2 > 0 && val1 > maxValue / val2) ||
-	        (val1 < 0 && val2 < 0 && val1 < maxValue / val2)) {
-	      throw std::overflow_error("Overflow");
-	    }
-	    if ((val1 > 0 && val2 < 0 && val2 < minValue / val1) ||
-	        (val1 < 0 && val2 > 0 && val1 < minValue / val2)) {
-	      throw std::underflow_error("Underflow");
-	    }
-	    res = val1 * val2;
-	  }
+      if ((val1 > 0 && val2 > 0 && val1 > maxValue / val2) || (val1 < 0 && val2 < 0 && val1 < maxValue / val2)) {
+        throw std::overflow_error("Overflow");
+      }
+      if ((val1 > 0 && val2 < 0 && val2 < minValue / val1) || (val1 < 0 && val2 > 0 && val1 < minValue / val2)) {
+        throw std::underflow_error("Underflow");
+      }
+      res = val1 * val2;
+    }
   } else if (operation == "/") {
     if (val2 == 0) {
       throw std::logic_error("Zero division");
