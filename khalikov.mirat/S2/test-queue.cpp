@@ -5,13 +5,13 @@ using namespace khalikov;
 
 BOOST_AUTO_TEST_SUITE(QueueTests)
 
-BOOST_AUTO_TEST_CASE(isEmpty_test)
+BOOST_AUTO_TEST_CASE(empty_test)
 {
   Queue< int > queue;
-  BOOST_CHECK(queue.isEmpty());
+  BOOST_CHECK(queue.empty());
   queue.push(12);
   queue.push(3);
-  BOOST_CHECK(!queue.isEmpty());
+  BOOST_CHECK(!queue.empty());
 }
 
 BOOST_AUTO_TEST_CASE(size_test)
@@ -85,7 +85,8 @@ BOOST_AUTO_TEST_CASE(drop_test)
   Queue< int > queue;
   queue.push(12);
   queue.push(3);
-  int val = queue.drop();
+  int val = queue.front();
+  queue.pop();
   BOOST_CHECK_EQUAL(val, 12);
   BOOST_CHECK_EQUAL(queue.size(), 1);
 }

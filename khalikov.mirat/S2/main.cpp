@@ -23,28 +23,19 @@ long long op(const long long val1, const long long val2, const std::string &oper
     }
     res = val1 - val2;
   } else if (operation == "*") {
-    if (val1 > 0) {
-      if (val2 > 0) {
-        if (val1 > maxValue / val2) {
-          throw std::overflow_error("Overflow");
-        }
-      } else {
-        if (val2 < minValue / val1) {
-          throw std::underflow_error("Underflow");
-        }
-      }
-    } else if (val1 < 0) {
-      if (val2 > 0) {
-        if (val1 < minValue / val2) {
-          throw std::underflow_error("Underflow");
-        } else {
-          if (val2 < maxValue / val1) {
-            throw std::overflow_error("Overflow");
-          }
-        }
-      }
-    }
-    res = val1 * val2;
+    if (!val1 || !val2) {
+      res = 0;
+    } else {
+	    if ((val1 > 0 && val2 > 0 && val1 > maxValue / val2) ||
+	        (val1 < 0 && val2 < 0 && val1 < maxValue / val2)) {
+	      throw std::overflow_error("Overflow");
+	    }
+	    if ((val1 > 0 && val2 < 0 && val2 < minValue / val1) ||
+	        (val1 < 0 && val2 > 0 && val1 < minValue / val2)) {
+	      throw std::underflow_error("Underflow");
+	    }
+	    res = val1 * val2;
+	  }
   } else if (operation == "/") {
     if (val2 == 0) {
       throw std::logic_error("Zero division");
@@ -75,8 +66,9 @@ long long result(khalikov::Queue< std::string > &queue)
 {
   khalikov::Stack< long long > stack;
   std::string str;
-  while (!queue.isEmpty()) {
-    str += queue.drop() + " ";
+  while (!queue.empty()) {
+    str += queue.front() + " ";
+    queue.pop();
   }
   std::string el;
   std::stringstream line(str);
@@ -84,8 +76,10 @@ long long result(khalikov::Queue< std::string > &queue)
     if (std::isdigit(el[0]) || (el.size() > 1 && el[0] == '-')) {
       stack.push(std::stoll(el));
     } else {
-      long long val2 = stack.drop();
-      long long val1 = stack.drop();
+      long long val2 = stack.top();
+      stack.pop();
+      long long val1 = stack.top();
+      stack.pop();
       stack.push(op(val1, val2, el));
     }
   }
@@ -117,27 +111,30 @@ khalikov::Queue< std::string > transform(const std::string &str)
     } else if (el == "(") {
       stack.push(el);
     } else if (el == ")") {
-      while (!stack.isEmpty() && stack.top() != "(") {
-        queue.push(stack.drop());
+      while (!stack.empty() && stack.top() != "(") {
+        queue.push(stack.top());
+        stack.pop();
       }
-      if (!stack.isEmpty()) {
+      if (!stack.empty()) {
         stack.pop();
       }
     } else {
-      if (stack.isEmpty() || stack.top() == "(") {
+      if (stack.empty() || stack.top() == "(") {
         stack.push(el);
       } else if (priority(el) > priority(stack.top())) {
         stack.push(el);
       } else {
-        while (!stack.isEmpty() && stack.top() != "(" && priority(el) <= priority(stack.top())) {
-          queue.push(stack.drop());
+        while (!stack.empty() && stack.top() != "(" && priority(el) <= priority(stack.top())) {
+          queue.push(stack.top());
+          stack.pop();
         }
         stack.push(el);
       }
     }
   }
-  while (!stack.isEmpty()) {
-    queue.push(stack.drop());
+  while (!stack.empty()) {
+    queue.push(stack.top());
+    stack.pop();
   }
   return queue;
 }

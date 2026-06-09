@@ -5,13 +5,13 @@ using namespace khalikov;
 
 BOOST_AUTO_TEST_SUITE(StackTests)
 
-BOOST_AUTO_TEST_CASE(isEmpty_test)
+BOOST_AUTO_TEST_CASE(empty_test)
 {
   Stack< int > stack;
-  BOOST_CHECK(stack.isEmpty());
+  BOOST_CHECK(stack.empty());
   stack.push(12);
   stack.push(3);
-  BOOST_CHECK(!stack.isEmpty());
+  BOOST_CHECK(!stack.empty());
 }
 
 BOOST_AUTO_TEST_CASE(size_test)
@@ -57,7 +57,8 @@ BOOST_AUTO_TEST_CASE(drop_test)
   Stack< int > stack;
   stack.push(12);
   stack.push(3);
-  int val = stack.drop();
+  int val = stack.top();
+  stack.pop();
   BOOST_CHECK_EQUAL(val, 3);
   BOOST_CHECK_EQUAL(stack.size(), 1);
 }

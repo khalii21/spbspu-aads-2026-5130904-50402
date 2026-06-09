@@ -1,6 +1,6 @@
 #ifndef STACK_HPP
 #define STACK_HPP
-#include "list.hpp"
+#include "../S1/list.hpp"
 #include <iostream>
 
 namespace khalikov
@@ -13,11 +13,12 @@ namespace khalikov
 
   public:
     void push(const T &rhs);
+    void push(const T &&rhs);
     void pop();
     const T &top() const;
-    T drop();
+    T &top();
     size_t size() const noexcept;
-    bool isEmpty() const noexcept;
+    bool empty() const noexcept;
   };
 }
 
@@ -28,9 +29,15 @@ void khalikov::Stack< T >::push(const T &rhs)
 }
 
 template< class T >
+void khalikov::Stack< T >::push(const T &&rhs)
+{
+  list.pushFront(std::move(rhs));
+}
+
+template< class T >
 void khalikov::Stack< T >::pop()
 {
-  if (isEmpty()) {
+  if (empty()) {
     throw std::logic_error("Stack is empty");
   }
   list.popFront();
@@ -39,7 +46,7 @@ void khalikov::Stack< T >::pop()
 template< class T >
 const T &khalikov::Stack< T >::top() const
 {
-  if (isEmpty()) {
+  if (empty()) {
     throw std::logic_error("Stack is empty");
   }
   auto it = list.cbegin();
@@ -47,12 +54,15 @@ const T &khalikov::Stack< T >::top() const
 }
 
 template< class T >
-T khalikov::Stack< T >::drop()
+T &khalikov::Stack< T >::top()
 {
-  T temp = top();
-  pop();
-  return temp;
+  if (empty()) {
+    throw std::logic_error("Stack is empty");
+  }
+  auto it = list.begin();
+  return *it;
 }
+
 
 template< class T >
 size_t khalikov::Stack< T >::size() const noexcept
@@ -61,7 +71,7 @@ size_t khalikov::Stack< T >::size() const noexcept
 }
 
 template< class T >
-bool khalikov::Stack< T >::isEmpty() const noexcept
+bool khalikov::Stack< T >::empty() const noexcept
 {
   return list.isEmpty();
 }

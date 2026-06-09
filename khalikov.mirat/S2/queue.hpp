@@ -1,6 +1,6 @@
 #ifndef QUEUE_HPP
 #define QUEUE_HPP
-#include "list.hpp"
+#include "../S1/list.hpp"
 #include <iostream>
 
 namespace khalikov
@@ -13,12 +13,14 @@ namespace khalikov
 
   public:
     const T &front() const;
+    T &front();
     const T &back() const;
+    T &back();
     void pop();
     void push(const T &rhs);
-    T drop();
+    void push(const T &&rhs);
     size_t size() const noexcept;
-    bool isEmpty() const noexcept;
+    bool empty() const noexcept;
     void swap(Queue &rhs) noexcept;
   };
 }
@@ -26,7 +28,7 @@ namespace khalikov
 template< class T >
 const T &khalikov::Queue< T >::back() const
 {
-  if (isEmpty()) {
+  if (empty()) {
     throw std::logic_error("Queue is empty");
   }
   auto it = list.cbegin();
@@ -37,13 +39,37 @@ const T &khalikov::Queue< T >::back() const
 }
 
 template< class T >
+T &khalikov::Queue< T >::back()
+{
+  if (empty()) {
+    throw std::logic_error("Queue is empty");
+  }
+  auto it = list.begin();
+  for (size_t i = 0; i < list.size() - 1; ++i) {
+    ++it;
+  }
+  return *it;
+}
+
+
+template< class T >
 const T &khalikov::Queue< T >::front() const
 {
-  if (isEmpty()) {
+  if (empty()) {
     throw std::logic_error("Queue is empty");
   }
   return *list.cbegin();
 }
+
+template< class T >
+T &khalikov::Queue< T >::front()
+{
+  if (empty()) {
+    throw std::logic_error("Queue is empty");
+  }
+  return *list.begin();
+}
+
 
 template< class T >
 void khalikov::Queue< T >::push(const T &rhs)
@@ -52,24 +78,22 @@ void khalikov::Queue< T >::push(const T &rhs)
 }
 
 template< class T >
+void khalikov::Queue< T >::push(const T &&rhs)
+{
+  list.pushBack(std::move(rhs));
+}
+
+template< class T >
 void khalikov::Queue< T >::pop()
 {
-  if (isEmpty()) {
+  if (empty()) {
     throw std::logic_error("Queue is empty");
   }
   list.popFront();
 }
 
 template< class T >
-T khalikov::Queue< T >::drop()
-{
-  T temp = front();
-  pop();
-  return temp;
-}
-
-template< class T >
-bool khalikov::Queue< T >::isEmpty() const noexcept
+bool khalikov::Queue< T >::empty() const noexcept
 {
   return list.isEmpty();
 }
