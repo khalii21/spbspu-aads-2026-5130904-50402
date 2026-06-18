@@ -315,6 +315,9 @@ void khalikov::List< T >::sort()
 template< class T >
 void khalikov::List< T >::uniqueSort()
 {
+  if (!h || h->next == h) {
+    return;
+  }
   sort();
   Node< T > *curr = h;
   while (curr->next != h) {
