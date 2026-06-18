@@ -18,12 +18,54 @@ namespace khalikov {
     void swap(RBTree &rhs) noexcept;
     void clear(TreeNode< T, Cmp > *node);
     bool empty() const noexcept;
-    TreeNode< T, Cmp > *copy(TreeNode< T, Cmp > *node, TreeNode< T, Cmp > *parent);
 
     private:
       TreeNode< T, Cmp > *root;
       Cmp cmp;
+      TreeNode< T, Cmp > *copy(TreeNode< T, Cmp > *node, TreeNode< T, Cmp > *parent);
+      void rotateLeft(TreeNode< T, Cmp > *x);
+      void rotateRight(TreeNode< T, Cmp > *x);
   };
+}
+
+template< class T, class Cmp >
+void khalikov::RBTree< T, Cmp >::rotateRight(TreeNode< T, Cmp > *x)
+{
+  TreeNode< T, Cmp > *y = x->left;
+  x->left = y->right;
+  if (y->right) {
+    y->right->parent = x;
+  }
+  y->parent = x->parent;
+  if (!x->parent) {
+    root = y;
+  } else if (x == x->parent->left) {
+    x->parent->left = y;
+  } else {
+    x->parent->right = y;
+  }
+  y->right = x;
+  x->parent = y;
+}
+
+template< class T, class Cmp >
+void khalikov::RBTree< T, Cmp >::rotateLeft(TreeNode< T, Cmp > *x)
+{
+  TreeNode< T, Cmp > *y = x->right;
+  x->right = y->left;
+  if (y->left) {
+    y->left->parent = x;
+  }
+  y->parent = x->parent;
+  if (!x->parent) {
+    root = y;
+  } else if (x == x->parent->left) {
+    x->parent->left = y;
+  } else {
+    x->parent->right = y;
+  }
+  y->left = x;
+  x->parent = y;
 }
 
 template< class T, class Cmp >
