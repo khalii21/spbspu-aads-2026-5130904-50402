@@ -44,7 +44,7 @@ namespace khalikov
 		void erase(size_t beg, size_t end);
 		void erase(LIter< T > pos);
 		void erase(LIter< T > first, LIter< T > last);
-		void erase(Liter< T > pos, size_t k);
+		void erase(LIter< T > pos, size_t k);
 		void insert(size_t i, const T & val);
 		void insert(size_t i, const Vector< T > & rhs, size_t beg, size_t end);
 		void insert(LIter< T > pos, const T & val);
@@ -57,7 +57,7 @@ namespace khalikov
     friend class LIter< T >;
     friend class LCIter< T >;
     //без проверки на капасити
-		void pushBackImpl(const T &)
+		void pushBackImpl(const T &);
 		//классная(::operator new и тд)
 		void reserve(size_t pos, size_t count);
     explicit Vector(size_t k);
@@ -77,7 +77,7 @@ void khalikov::Vector< T >::reserve(size_t cap)
 	{
 		for (; i < getSize(); i++)
 		{
-			new (d + i) = T(std::move(data_[i]));
+			new (d + i) T(std::move(data_[i]));
 		}
 	}
 	catch (...)
@@ -89,12 +89,13 @@ void khalikov::Vector< T >::reserve(size_t cap)
 		::operator delete(d);
 		throw;
 	}
-	::operator delete data_;
+	::operator delete(data_);
 	data_ = d;
 	cap_ = cap;
 }
 
-template< class T, class IT >
+template< class T >
+template< class IT >
 size_t khalikov::Vector< T >::pushBackRange(IT begin, size_t k)
 {
 	size_t oldSize = size_;
@@ -118,12 +119,13 @@ size_t khalikov::Vector< T >::pushBackRange(IT begin, size_t k)
 }
 
 template< class T >
-void khalikov::Vector< T >::pushBackImpl(const T &)
+void khalikov::Vector< T >::pushBackImpl(const T &val)
 {
 	new (data_ + size_) T(val);
 	++size_;
 }
 
+template< class T >
 void khalikov::Vector< T >::shrinkToFit()
 {
 	if (size_ == cap_)
