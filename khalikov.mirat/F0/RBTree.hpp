@@ -18,6 +18,7 @@ namespace khalikov {
     void swap(RBTree &rhs) noexcept;
     void clear(TreeNode< T, Cmp > *node);
     bool empty() const noexcept;
+    bool insert(const T &val);
 
     private:
       TreeNode< T, Cmp > *root;
@@ -25,7 +26,86 @@ namespace khalikov {
       TreeNode< T, Cmp > *copy(TreeNode< T, Cmp > *node, TreeNode< T, Cmp > *parent);
       void rotateLeft(TreeNode< T, Cmp > *x);
       void rotateRight(TreeNode< T, Cmp > *x);
+      void fixInsert(TreeNode< T, Cmp > *x);
   };
+}
+
+template< class T, class Cmp >
+bool khalikov::RBTree< T, Cmp >::insert(const T &val)
+{
+  TreeNode< T, Cmp > *z = new TreeNode< T, Cmp >(val);
+  TreeNode< T, Cmp > *y = nullptr;
+  TreeNode< T, Cmp > *x = root;
+  while (x) {
+    y = x;
+    if (!cmp(z->data, x->data) && !cmp(x->data, z->data)) {
+      delete z;
+      return false;
+    }
+    if (cmp(z->data, x->data)) {
+      x = x->left;
+    } else {
+      x = x->right;
+    }
+  }
+  z->parent = y;
+  if (!y) {
+    root = z;
+  } else if (cmp(z->data, y->data)) {
+    y->left = z;
+  } else {
+    y->right = z;
+  }
+  fixInsert(z);
+  return true;
+}
+
+template< class T, class Cmp >
+void khalikov::RBTree< T, Cmp >::fixInsert(TreeNode< T, Cmp > *x)
+{
+  while (x != root && x->parent->color == 'R') {
+    TreeNode< T, Cmp > *p = x->parent;
+    TreeNode< T, Cmp > *g = p->parent;
+    if (p == g->left) {
+      TreeNode< T, Cmp > *u = g->right;
+      if (u && u->color == 'R') {
+        p->color = 'B';
+        u->color = 'B';
+        g->color = 'R';
+        x = g;
+      }
+      else {
+        if (x == p->right) {
+          x = p;
+          rotateLeft(x);
+          p = x->parent;
+        }
+        p->color = 'B';
+        g->color = 'R';
+        rotateRight(g);
+      }
+    }
+    else {
+      TreeNode< T, Cmp > *u = g->left;
+      if (u && u->color == 'R') {
+        p->color = 'B';
+        u->color = 'B';
+        g->color = 'R';
+        x = g;
+      }
+      else {
+        if (x == p->left) {
+          x = p;
+          rotateRight(x);
+          p = x->parent;
+        }
+        p->color = 'B';
+        g->color = 'R';
+        rotateLeft(g);
+      }
+    }
+  }
+  root->color = 'B';
 }
 
 template< class T, class Cmp >
