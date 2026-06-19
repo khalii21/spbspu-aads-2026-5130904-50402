@@ -30,6 +30,7 @@ namespace khalikov {
       void fixInsert(TreeNode< T, Cmp > *x);
       TreeNode< T, Cmp > *fullLeft(TreeNode< T, Cmp > *node);
       void transplant(TreeNode< T, Cmp > *u, TreeNode< T, Cmp > *v);
+      void fixDelete(TreeNode< T, Cmp > *x, TreeNode< T, Cmp > *xParent);
   };
 }
 
@@ -109,6 +110,134 @@ void khalikov::RBTree< T, Cmp >::fixInsert(TreeNode< T, Cmp > *x)
     }
   }
   root->color = 'B';
+}
+
+template< class T, class Cmp >
+bool khalikov::RBTree< T, Cmp >::remove(const T &val)
+{
+  TreeNode< T, Cmp > *z = root;
+  while (z && (cmp(val, z->data) || cmp(z->data, val))) {
+    z = cmp(val, z->data) ? z->left : z->right;
+  }
+  if (!z) {
+    return false;
+  }
+  TreeNode< T, Cmp > *x = nullptr;
+  TreeNode< T, Cmp > *xParent = nullptr;
+  TreeNode< T, Cmp > *y = z;
+  char yColor = y->color;
+  if (!z->left) {
+    x = z->right;
+    xParent = z->parent;
+    transplant(z, z->right);
+  } else if (!z->right) {
+    x = z->left;
+    xParent = z->parent;
+    transplant(z, z->left);
+  } else {
+    y = fullLeft(z->right);
+    yColor = y->color;
+    x = y->right;
+    if (y->parent == z) {
+      xParent = y;
+    } else {
+      xParent = y->parent;
+      transplant(y, y->right);
+      y->right = z->right;
+      if (y->right) {
+        y->right->parent = y;
+      }
+    }
+    transplant(z, y);
+    y->left = z->left;
+    y->left->parent = y;
+    y->color = z->color;
+  }
+  delete z;
+  if (yColor == 'B') {
+    fixDelete(x, xParent);
+  }
+  return true;
+}
+
+template< class T, class Cmp >
+void khalikov::RBTree< T, Cmp >::fixDelete(TreeNode< T, Cmp > *x, TreeNode< T, Cmp > *xParent)
+{
+  while (x != root && (!x || x->color == 'B')) {
+    if (x == xParent->left) {
+      TreeNode< T, Cmp> *s = xParent->right;
+      if (s && s->color == 'R') {
+        s->color = 'B';
+        xParent->color = 'R';
+        rotateLeft(xParent);
+        s = xParent->right;
+      }
+      if ((!s->left || s->left->color == 'B') && (!s->right || s->right->color == 'B')) {
+        if (s) {
+          s->color = 'R';
+        }
+        x = xParent;
+        xParent = x->parent;
+      }
+      else {
+        if (!s->right || s->right->color == 'B') {
+          if (s->left) {
+            s->left->color = 'B';
+          }
+          s->color = 'R';
+          rotateRight(s);
+          s = xParent->right;
+        }
+        if (s) {
+          s->color = xParent->color;
+        }
+        xParent->color = 'B';
+        if (s && s->right) {
+          s->right->color = 'B';
+        }
+        rotateLeft(xParent);
+        x = root;
+      }
+    }
+    else {
+      TreeNode< T, Cmp > *s = xParent->left;
+      if (s && s->color == 'R') {
+        s->color = 'B';
+        xParent->color = 'R';
+        rotateRight(xParent);
+        s = xParent->left;
+      }
+      if ((!s->left || s->left->color == 'B') && (!s->right || s->right->color == 'B')) {
+        if (s) {
+          s->color = 'R';
+        }
+        x = xParent;
+        xParent = x->parent;
+      }
+      else {
+        if (!s->left || s->left->color == 'B') {
+          if (s->right) {
+            s->right->color = 'B';
+          }
+          s->color = 'R';
+          rotateLeft(s);
+          s = xParent->left;
+        }
+        if (s) {
+          s->color = xParent->color;
+        }
+        xParent->color = 'B';
+        if (s && s->left) {
+          s->left->color = 'B';
+        }
+        rotateRight(xParent);
+        x = root;
+      }
+    }
+  }
+  if (x) {
+    x->color = 'B';
+  }
 }
 
 template< class T, class Cmp >
