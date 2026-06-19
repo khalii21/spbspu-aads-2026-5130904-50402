@@ -3,11 +3,19 @@
 
 #include <utility>
 #include "TreeNode.hpp"
+#include "RBIt.hpp"
+#include "RBCIt.hpp"
+
+
+
 
 namespace khalikov {
   template< class T, class Cmp >
   struct RBTree
   {
+    using it_t = khalikov::RBIt< T, Cmp >;
+    using cit_t = khalikov::RBCIt< T, Cmp >;
+
     RBTree();
     ~RBTree();
     RBTree(const RBTree &rhs);
@@ -21,6 +29,12 @@ namespace khalikov {
     bool insert(const T &val);
     bool remove(const T &val);
 
+    it_t begin() noexcept;
+    it_t end() noexcept;
+
+    cit_t cbegin() const noexcept;
+    cit_t cend() const noexcept;
+
     private:
       TreeNode< T, Cmp > *root;
       Cmp cmp;
@@ -32,6 +46,32 @@ namespace khalikov {
       void transplant(TreeNode< T, Cmp > *u, TreeNode< T, Cmp > *v);
       void fixDelete(TreeNode< T, Cmp > *x, TreeNode< T, Cmp > *xParent);
   };
+}
+
+template< class T, class Cmp >
+typename khalikov::RBTree< T, Cmp >::cit_t khalikov::RBTree< T, Cmp >::cbegin() const noexcept
+{
+  return cit_t(fullLeft(root));
+}
+
+
+template< class T, class Cmp >
+typename khalikov::RBTree< T, Cmp >::cit_t khalikov::RBTree< T, Cmp >::cend() const noexcept
+{
+  return cit_t();
+}
+
+
+template< class T, class Cmp >
+typename khalikov::RBTree< T, Cmp >::it_t khalikov::RBTree< T, Cmp >::begin() noexcept
+{
+  return it_t(fullLeft(root));
+}
+
+template< class T, class Cmp >
+typename khalikov::RBTree< T, Cmp >::it_t khalikov::RBTree< T, Cmp >::end() noexcept
+{
+  return it_t();
 }
 
 template< class T, class Cmp >
