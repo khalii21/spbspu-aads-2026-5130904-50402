@@ -19,6 +19,7 @@ namespace khalikov {
     void clear(TreeNode< T, Cmp > *node);
     bool empty() const noexcept;
     bool insert(const T &val);
+    bool remove(const T &val);
 
     private:
       TreeNode< T, Cmp > *root;
@@ -27,6 +28,8 @@ namespace khalikov {
       void rotateLeft(TreeNode< T, Cmp > *x);
       void rotateRight(TreeNode< T, Cmp > *x);
       void fixInsert(TreeNode< T, Cmp > *x);
+      TreeNode< T, Cmp > *fullLeft(TreeNode< T, Cmp > *node);
+      void transplant(TreeNode< T, Cmp > *u, TreeNode< T, Cmp > *v);
   };
 }
 
@@ -109,6 +112,30 @@ void khalikov::RBTree< T, Cmp >::fixInsert(TreeNode< T, Cmp > *x)
 }
 
 template< class T, class Cmp >
+khalikov::TreeNode< T, Cmp >* khalikov::RBTree< T, Cmp >::fullLeft(TreeNode< T, Cmp > *node)
+{
+  while (node && node->left) {
+    node = node->left;
+  }
+  return node;
+}
+
+template< class T, class Cmp >
+void khalikov::RBTree< T, Cmp >::transplant(TreeNode< T, Cmp > *u, TreeNode< T, Cmp > *v)
+{
+  if (!u->parent) {
+    root = v;
+  } else if (u == u->parent->left) {
+    u->parent->left = v;
+  } else {
+    u->parent->right = v;
+  }
+  if (v) {
+    v->parent = u->parent;
+  }
+}
+
+template< class T, class Cmp >
 void khalikov::RBTree< T, Cmp >::rotateRight(TreeNode< T, Cmp > *x)
 {
   TreeNode< T, Cmp > *y = x->left;
@@ -116,14 +143,7 @@ void khalikov::RBTree< T, Cmp >::rotateRight(TreeNode< T, Cmp > *x)
   if (y->right) {
     y->right->parent = x;
   }
-  y->parent = x->parent;
-  if (!x->parent) {
-    root = y;
-  } else if (x == x->parent->left) {
-    x->parent->left = y;
-  } else {
-    x->parent->right = y;
-  }
+  transplant(x, y);
   y->right = x;
   x->parent = y;
 }
@@ -136,14 +156,7 @@ void khalikov::RBTree< T, Cmp >::rotateLeft(TreeNode< T, Cmp > *x)
   if (y->left) {
     y->left->parent = x;
   }
-  y->parent = x->parent;
-  if (!x->parent) {
-    root = y;
-  } else if (x == x->parent->left) {
-    x->parent->left = y;
-  } else {
-    x->parent->right = y;
-  }
+  transplant(x, y);
   y->left = x;
   x->parent = y;
 }
