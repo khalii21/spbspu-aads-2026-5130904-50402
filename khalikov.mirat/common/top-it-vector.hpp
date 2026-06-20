@@ -15,14 +15,16 @@ namespace khalikov
   struct Vector
   {
     Vector();
-    explicit Vector< T >(std::initializer_list< T >) noexcept;
+    Vector(size_t k);
+    explicit Vector(std::initializer_list< T >);
     ~Vector();
+
     Vector(const Vector< T > &);
-    Vector< T > & operator=(const Vector< T > & rhs);
+    Vector &operator=(const Vector< T > & rhs);
     T & operator[](size_t id) noexcept;
     const T & operator[](size_t id) const noexcept;
-		Vector(Vector< T > &&);
-		Vector< T > & operator=(Vector< T > &&) noexcept;
+		Vector(Vector< T > &&) noexcept;
+		Vector< T > &operator=(Vector< T > &&) noexcept;
 
     bool isEmpty() const noexcept;
     void pushBack(const T &);
@@ -56,12 +58,144 @@ namespace khalikov
     size_t cap_, size_;
     friend class LIter< T >;
     friend class LCIter< T >;
-    //без проверки на капасити
 		void pushBackImpl(const T &);
-		//классная(::operator new и тд)
-		void reserve(size_t pos, size_t count);
-    explicit Vector(size_t k);
   };
+}
+
+template< class T >
+void khalikov::Vector< T >::erase(size_t i)
+{
+  assert(i < size_);
+  for (size_t j = i; j < size_ - 1; ++j) {
+    data_[j] = std::move(data_[j + 1]);
+  }
+  data_[size_ - 1].~T();
+  --size_;
+}
+
+template< class T >
+void khalikov::Vector< T >::erase(size_t beg, size_t end)
+{
+  assert(beg <= end && end <= size_);
+  if (beg == end) return;
+  size_t k = end - beg;
+  for (size_t j = beg; j < size_ - k; ++j)
+  {
+     data_[j] = std::move(data_[j + k]);
+  }
+  for (size_t j = size_ - k; j < size_; ++j)
+  {
+    data_[j].~T();
+  }
+  size_ -= k;
+}
+
+template< class T >
+void khalikov::Vector< T >::erase(LIter< T > first, LIter< T > last)
+{
+   size_t beg = &(*first) - data_;
+   size_t end = &(*last) - data_;
+   erase(beg, end);
+}
+
+template< class T >
+void khalikov::Vector< T >::erase(LIter< T > pos, size_t k)
+{
+   size_t beg = &(*pos) - data_;
+   erase(beg, beg + k);
+}
+
+template< class T >
+void khalikov::Vector< T >::erase(LIter< T > pos)
+{
+  size_t index = &(*pos) - data_;
+  erase(index);
+}
+
+template< class T >
+void khalikov::Vector< T >::insert(size_t i, const Vector< T > & rhs, size_t beg, size_t end)
+{
+  assert(i <= size_);
+  assert(beg <= end && end <= rhs.size_);
+  if (beg == end) {
+    return;
+  }
+  size_t count = end - beg;
+  if (size_ + count > cap_) {
+    size_t newCap = cap_ == 0 ? count : cap_;
+    while (newCap < size_ + count) {
+      newCap *= 2;
+    }
+    reserve(newCap);
+  }
+  size_t moveCount = size_ - i;
+  for (size_t j = 0; j < count; ++j) {
+    if (size_ - j > i) {
+      new (data_ + size_ + count - 1 - j) T(std::move(data_[size_ - 1 - j]));
+    }
+  }
+  for (size_t j = size_ - 1; j >= i + count && j < size_; --j) {
+    data_[j] = std::move(data_[j - count]);
+  }
+  for (size_t j = 0; j < count; ++j) {
+    if (i + j < size_) {
+      data_[i + j] = rhs.data_[beg + j];
+    } else {
+      new (data_ + i + j) T(rhs.data_[beg + j]);
+    }
+  }
+  size_ += count;
+}
+
+template< class T >
+void khalikov::Vector< T >::insert(size_t i, const T & val)
+{
+   assert(i <= size_);
+   if (i == size_)
+   {
+      pushBack(val);
+      return;
+   }
+   if (size_ == cap_)
+   {
+      size_t newCapacity = cap_ == 0 ? 4 : cap_ * 2;
+      reserve(newCapacity);
+   }
+   new (data_ + size_) T(std::move(data_[size_ - 1]));
+   for (size_t j = size_ - 1; j > i; --j)
+   {
+      data_[j] = std::move(data_[j - 1]);
+   }
+   data_[i] = val;
+   ++size_;
+}
+
+template< class T >
+void khalikov::Vector< T >::insert(LIter< T > pos, const T & val)
+{
+   size_t index = &(*pos) - data_;
+   insert(index, val);
+}
+
+template< class T >
+void khalikov::Vector< T >::insert(LIter< T > pos, const Vector< T > & other)
+{
+  size_t index = &(*pos) - data_;
+  insert(index, other, 0, other.getSize());
+}
+
+template< class T >
+void khalikov::Vector< T >::insert(LIter< T > pos, size_t k, const T & val)
+{
+  if (k == 0) return;
+  size_t index = &(*pos) - data_;
+  assert(index <= size_);
+  Vector< T > temp;
+  temp.reserve(k);
+  for (size_t j = 0; j < k; ++j) {
+    temp.pushBack(val);
+  }
+  insert(index, temp, 0, k);
 }
 
 template< class T >
@@ -80,14 +214,14 @@ void khalikov::Vector< T >::reserve(size_t cap)
 			new (d + i) T(std::move(data_[i]));
 		}
 	}
-	catch (...)
+	catch (const std::bad_alloc&)
 	{
 		for (size_t j = 0; j < i; ++j)
 		{
 			(d + j)->~T();
 		}
 		::operator delete(d);
-		throw;
+		throw std::bad_alloc();
 	}
 	::operator delete(data_);
 	data_ = d;
@@ -108,12 +242,12 @@ size_t khalikov::Vector< T >::pushBackRange(IT begin, size_t k)
 			newCap = newCap * 2;
 		}
 		reserve(newCap);
-		for (size_t i = 0; i < k; ++i)
-		{
-			new (data_ + size_) T(*begin);
-			++size_;
-			++begin;
-		}
+  }
+	for (size_t i = 0; i < k; ++i)
+	{
+		new (data_ + size_) T(*begin);
+		++size_;
+		++begin;
 	}
 	return newSize;
 }
@@ -132,48 +266,26 @@ void khalikov::Vector< T >::shrinkToFit()
 	{
 		return;
 	}
-
-	if (size_ == 0)
-	{
-		::operator delete(data_);
-		data_ = nullptr;
-		cap_ = 0;
-		return;
-	}
-
-	T * d = static_cast< T * >(::operator new(sizeof(T) * size_));
-	size_t i = 0;
-	try
-	{
-		for (; i < size_; ++i)
-		{
-			new (d + i) T(std::move(data_[i]));
-		}
-	}
-	catch (...)
-	{
-		for (size_t j = 0; j < i; j++)
-		{
-			(d + j)->~T();
-		}
-		::operator delete(d);
-		throw;
-	}
-	for (size_t j = 0; j < size_; ++j)
-	{
-		data_[j].~T();
-	}
-	::operator delete(data_);
+  Vector< T > temp(size_);
+  for (size_t i = 0; i < size_; ++i) {
+    new (temp.data_ + temp.size_) T(std::move(data_[i]));
+    temp.size_++;
+  }
+  swap(temp);
 }
 
 template< class T >
-khalikov::Vector< T >::Vector(std::initializer_list< T > il) noexcept:
+khalikov::Vector< T >::Vector(std::initializer_list< T > il):
 	Vector< T >(il.size())
 {
-	size_t i = 0;
-	for (auto &&v: il)
-	{
-		data_[i++] = std::move(v);
+  try {
+    for (auto &&v: il) {
+	    new (data_ + size_) T(v);
+	    ++size_;
+	  }
+	} catch (const std::bad_alloc&) {
+	  this->~Vector();
+	  throw std::bad_alloc();
 	}
 }
 
@@ -186,13 +298,14 @@ size_t khalikov::Vector< T >::getSize() const noexcept
 template< class T >
 void khalikov::Vector< T >::pushFront(const T & val)
 {
-	Vector< T > cpy(getSize() + 1);
-	cpy.data_[0] = val;
-	for (size_t i = 1; i <= size_; ++i)
+	Vector< T > cpy(size_ + 1);
+	new (cpy.data_ + cpy.size_) T(val);
+	cpy.size_++;
+	for (size_t i = 0; i < size_; ++i)
 	{
-		cpy.data_[i] = data_[i-1];
+	  new (cpy.data_ + cpy.size_) T(std::move(data_[i]));
+	  cpy.size_++;
 	}
-	cpy.size_ = size_ + 1;
 	swap(cpy);
 }
 
@@ -211,13 +324,9 @@ bool khalikov::Vector< T >::isEmpty() const noexcept
 template< class T >
 void khalikov::Vector< T >::popBack()
 {
-	Vector< T > cpy(size_ - 1);
-	for (size_t i = 0; i < size_ - 1; i++)
-	{
-		cpy.data_[i] = data_[i];
-		cpy.size_++;
-	}
-	swap(cpy);
+  assert(size_ > 0);
+  data_[size_ - 1].~T();
+  --size;
 }
 
 template< class T >
@@ -237,7 +346,12 @@ khalikov::Vector< T >::Vector(size_t k):
 template< class T >
 khalikov::Vector< T >::~Vector()
 {
-	delete[] data_;
+  if (data_) {
+    for (size_t i = 0; i < size_; ++i) {
+      data_[i].~T();
+    }
+    ::operator delete(data_);
+  }
 }
 
 template< class T >
@@ -247,11 +361,14 @@ khalikov::Vector< T >::Vector(const Vector< T > & rhs):
 	size_(0)
 {
 	Vector< T > temp(rhs.cap_);
-	for (size_t i = 0; i < rhs.size_; i++)
-	{
-		temp.data_[i] = rhs.data_[i];
+	try {
+	  for (size_t i = 0; i < rhs.size_; i++) {
+	    new (temp.data_ + i) T(rhs.data_[i]);
+		  temp.size_++;
+	  }
+	} catch (const std::bad_alloc&) {
+	  throw std::bad_alloc();
 	}
-	temp.size_ = rhs.size_;
 	swap(temp);
 }
 
@@ -262,6 +379,8 @@ khalikov::Vector< T >::Vector(Vector< T > && rhs):
 	size_(rhs.size_)
 {
 	rhs.data_ = nullptr;
+  rhs.size_ = 0;
+  rhs.cap_ = 0;
 }
 
 template< class T >
@@ -292,7 +411,7 @@ khalikov::Vector< T > & khalikov::Vector< T >::operator=(const Vector< T > & rhs
 		return *this;
 	}
 	Vector< T > cpy(rhs);
-	swap(rhs);
+	swap(cpy);
 	return *this;
 }
 
@@ -300,21 +419,23 @@ template< class T >
 void khalikov::Vector< T >::resize(size_t newCapacity)
 {
 	Vector< T > res(newCapacity);
-	size_t index = 0;
-	for (size_t i = 0; i < size_; i++)
+	for (size_t i = 0; i < size_ && i < newCapacity; i++)
 	{
-		res.data_[index++] = data_[i];
+    new (res.data_ + res.size_) T(std::move(data_[i]));
+    res.size_++;
 	}
-	res.size_ = index;
+	while (res.size_ < newCapacity) {
+	  new (res.data_ + res.size_) T();
+	  res.size_++;
+	}
 	swap(res);
 }
 
 template< class T >
 T & khalikov::Vector< T >::operator[](size_t id) noexcept
 {
-	const Vector< T > * cthis = this;
-	const T& ret = (*cthis)[id];
-	return const_cast< T & >(ret);
+  assert(id < getSize());
+  return data_[id];
 }
 
 template< class T >
@@ -327,19 +448,19 @@ const T & khalikov::Vector< T >::operator[](size_t id) const noexcept
 template< class T >
 T& khalikov::Vector< T >::at(size_t id)
 {
-	const Vector< T > * cthis = this;
-	const T& ret = cthis->at(id);
-	return const_cast< T & >(ret);
+  if (id >= size_) {
+    throw std::out_of_range("Vector index out of range");
+  }
+  return data_[id];
 }
 
 template< class T >
 const T& khalikov::Vector< T >::at(size_t id) const
 {
-	if (id < getSize())
-	{
-		return (*this)[id];
-	}
-	throw std::range_error("bad_id");
+  if (id >= size_) {
+    throw std::out_of_range("Vector index out of range");
+  }
+  return data_[id];
 }
 
 
@@ -348,14 +469,14 @@ void khalikov::Vector< T >::pushBack(const T & val)
 {
 	if (cap_ > size_)
 	{
-		data_[size_] = val;
+    new (data_ + size_) T(val);
 		size_++;
 	}
 	else
 	{
-		size_t newCapacity = cap_ + 5;
-		resize(newCapacity);
-		data_[size_] = val;
+		size_t newCapacity = cap_ == 0 ? 4 : cap_ * 2;
+		reserve(newCapacity);
+    new (data_ + size_) T(val);
 		size_++;
 	}
 }
