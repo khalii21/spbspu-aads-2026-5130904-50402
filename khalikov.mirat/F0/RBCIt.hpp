@@ -3,9 +3,9 @@
 
 #include "TreeNode.hpp"
 
-namespace khalikov {
-  template< class T, class Cmp >
-  struct RBCIt
+namespace khalikov
+{
+  template < class T, class Cmp > struct RBCIt
   {
     RBCIt();
     explicit RBCIt(TreeNode< T, Cmp > *node);
@@ -19,47 +19,42 @@ namespace khalikov {
     RBCIt &operator++();
     RBCIt operator++(int);
 
-    private:
-      TreeNode< T, Cmp > *curr;
+  private:
+    TreeNode< T, Cmp > *curr;
   };
 }
 
-template< class T, class Cmp >
+template < class T, class Cmp >
 khalikov::RBCIt< T, Cmp >::RBCIt():
   curr(nullptr)
 {}
 
-template< class T, class Cmp >
+template < class T, class Cmp >
 khalikov::RBCIt< T, Cmp >::RBCIt(TreeNode< T, Cmp > *node):
   curr(node)
 {}
 
-template< class T, class Cmp >
-const T &khalikov::RBCIt< T, Cmp >::operator*() const
+template < class T, class Cmp > const T &khalikov::RBCIt< T, Cmp >::operator*() const
 {
   return curr->data;
 }
 
-template< class T, class Cmp >
-const T *khalikov::RBCIt< T, Cmp >::operator->() const
+template < class T, class Cmp > const T *khalikov::RBCIt< T, Cmp >::operator->() const
 {
   return &(curr->data);
 }
 
-template< class T, class Cmp >
-bool khalikov::RBCIt< T, Cmp >::operator==(const RBCIt &rhs) const noexcept
+template < class T, class Cmp > bool khalikov::RBCIt< T, Cmp >::operator==(const RBCIt &rhs) const noexcept
 {
   return curr == rhs.curr;
 }
 
-template< class T, class Cmp >
-bool khalikov::RBCIt< T, Cmp >::operator!=(const RBCIt &rhs) const noexcept
+template < class T, class Cmp > bool khalikov::RBCIt< T, Cmp >::operator!=(const RBCIt &rhs) const noexcept
 {
   return curr != rhs.curr;
 }
 
-template< class T, class Cmp >
-khalikov::RBCIt< T, Cmp > &khalikov::RBCIt< T, Cmp >::operator++()
+template < class T, class Cmp > khalikov::RBCIt< T, Cmp > &khalikov::RBCIt< T, Cmp >::operator++()
 {
   if (!curr) {
     return *this;
@@ -69,8 +64,7 @@ khalikov::RBCIt< T, Cmp > &khalikov::RBCIt< T, Cmp >::operator++()
     while (curr->left) {
       curr = curr->left;
     }
-  }
-  else {
+  } else {
     TreeNode< T, Cmp > *p = curr->parent;
     while (p && curr == p->right) {
       curr = p;
@@ -81,8 +75,7 @@ khalikov::RBCIt< T, Cmp > &khalikov::RBCIt< T, Cmp >::operator++()
   return *this;
 }
 
-template< class T, class Cmp >
-khalikov::RBCIt< T, Cmp > khalikov::RBCIt< T, Cmp >::operator++(int)
+template < class T, class Cmp > khalikov::RBCIt< T, Cmp > khalikov::RBCIt< T, Cmp >::operator++(int)
 {
   RBCIt temp = *this;
   ++(*this);

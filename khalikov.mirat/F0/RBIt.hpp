@@ -3,9 +3,9 @@
 
 #include "TreeNode.hpp"
 
-namespace khalikov {
-  template< class T, class Cmp >
-  struct RBIt
+namespace khalikov
+{
+  template < class T, class Cmp > struct RBIt
   {
     RBIt();
     explicit RBIt(TreeNode< T, Cmp > *node);
@@ -19,47 +19,42 @@ namespace khalikov {
     RBIt &operator++();
     RBIt operator++(int);
 
-    private:
-      TreeNode< T, Cmp > *curr;
+  private:
+    TreeNode< T, Cmp > *curr;
   };
 }
 
-template< class T, class Cmp >
+template < class T, class Cmp >
 khalikov::RBIt< T, Cmp >::RBIt():
   curr(nullptr)
 {}
 
-template< class T, class Cmp >
+template < class T, class Cmp >
 khalikov::RBIt< T, Cmp >::RBIt(TreeNode< T, Cmp > *node):
   curr(node)
 {}
 
-template< class T, class Cmp >
-T &khalikov::RBIt< T, Cmp >::operator*()
+template < class T, class Cmp > T &khalikov::RBIt< T, Cmp >::operator*()
 {
   return curr->data;
 }
 
-template< class T, class Cmp >
-T *khalikov::RBIt< T, Cmp >::operator->()
+template < class T, class Cmp > T *khalikov::RBIt< T, Cmp >::operator->()
 {
   return &(curr->data);
 }
 
-template< class T, class Cmp >
-bool khalikov::RBIt< T, Cmp >::operator==(const RBIt &rhs) const noexcept
+template < class T, class Cmp > bool khalikov::RBIt< T, Cmp >::operator==(const RBIt &rhs) const noexcept
 {
   return curr == rhs.curr;
 }
 
-template< class T, class Cmp >
-bool khalikov::RBIt< T, Cmp >::operator!=(const RBIt &rhs) const noexcept
+template < class T, class Cmp > bool khalikov::RBIt< T, Cmp >::operator!=(const RBIt &rhs) const noexcept
 {
   return curr != rhs.curr;
 }
 
-template< class T, class Cmp >
-khalikov::RBIt< T, Cmp > &khalikov::RBIt< T, Cmp >::operator++()
+template < class T, class Cmp > khalikov::RBIt< T, Cmp > &khalikov::RBIt< T, Cmp >::operator++()
 {
   if (!curr) {
     return *this;
@@ -69,8 +64,7 @@ khalikov::RBIt< T, Cmp > &khalikov::RBIt< T, Cmp >::operator++()
     while (curr->left) {
       curr = curr->left;
     }
-  }
-  else {
+  } else {
     TreeNode< T, Cmp > *p = curr->parent;
     while (p && curr == p->right) {
       curr = p;
@@ -81,8 +75,7 @@ khalikov::RBIt< T, Cmp > &khalikov::RBIt< T, Cmp >::operator++()
   return *this;
 }
 
-template< class T, class Cmp >
-khalikov::RBIt< T, Cmp > khalikov::RBIt< T, Cmp >::operator++(int)
+template < class T, class Cmp > khalikov::RBIt< T, Cmp > khalikov::RBIt< T, Cmp >::operator++(int)
 {
   RBIt temp = *this;
   ++(*this);

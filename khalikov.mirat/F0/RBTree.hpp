@@ -6,12 +6,9 @@
 #include "RBIt.hpp"
 #include "RBCIt.hpp"
 
-
-
-
-namespace khalikov {
-  template< class T, class Cmp >
-  struct RBTree
+namespace khalikov
+{
+  template < class T, class Cmp > struct RBTree
   {
     using it_t = khalikov::RBIt< T, Cmp >;
     using cit_t = khalikov::RBCIt< T, Cmp >;
@@ -35,47 +32,42 @@ namespace khalikov {
     cit_t cbegin() const noexcept;
     cit_t cend() const noexcept;
 
-    private:
-      TreeNode< T, Cmp > *root;
-      Cmp cmp;
-      TreeNode< T, Cmp > *copy(TreeNode< T, Cmp > *node, TreeNode< T, Cmp > *parent);
-      void rotateLeft(TreeNode< T, Cmp > *x);
-      void rotateRight(TreeNode< T, Cmp > *x);
-      void fixInsert(TreeNode< T, Cmp > *x);
-      TreeNode< T, Cmp > *fullLeft(TreeNode< T, Cmp > *node);
-      void transplant(TreeNode< T, Cmp > *u, TreeNode< T, Cmp > *v);
-      void fixDelete(TreeNode< T, Cmp > *x, TreeNode< T, Cmp > *xParent);
+  private:
+    TreeNode< T, Cmp > *root;
+    Cmp cmp;
+    TreeNode< T, Cmp > *copy(TreeNode< T, Cmp > *node, TreeNode< T, Cmp > *parent);
+    void rotateLeft(TreeNode< T, Cmp > *x);
+    void rotateRight(TreeNode< T, Cmp > *x);
+    void fixInsert(TreeNode< T, Cmp > *x);
+    TreeNode< T, Cmp > *fullLeft(TreeNode< T, Cmp > *node);
+    void transplant(TreeNode< T, Cmp > *u, TreeNode< T, Cmp > *v);
+    void fixDelete(TreeNode< T, Cmp > *x, TreeNode< T, Cmp > *xParent);
   };
 }
 
-template< class T, class Cmp >
+template < class T, class Cmp >
 typename khalikov::RBTree< T, Cmp >::cit_t khalikov::RBTree< T, Cmp >::cbegin() const noexcept
 {
   return cit_t(fullLeft(root));
 }
 
-
-template< class T, class Cmp >
+template < class T, class Cmp >
 typename khalikov::RBTree< T, Cmp >::cit_t khalikov::RBTree< T, Cmp >::cend() const noexcept
 {
   return cit_t();
 }
 
-
-template< class T, class Cmp >
-typename khalikov::RBTree< T, Cmp >::it_t khalikov::RBTree< T, Cmp >::begin() noexcept
+template < class T, class Cmp > typename khalikov::RBTree< T, Cmp >::it_t khalikov::RBTree< T, Cmp >::begin() noexcept
 {
   return it_t(fullLeft(root));
 }
 
-template< class T, class Cmp >
-typename khalikov::RBTree< T, Cmp >::it_t khalikov::RBTree< T, Cmp >::end() noexcept
+template < class T, class Cmp > typename khalikov::RBTree< T, Cmp >::it_t khalikov::RBTree< T, Cmp >::end() noexcept
 {
   return it_t();
 }
 
-template< class T, class Cmp >
-bool khalikov::RBTree< T, Cmp >::insert(const T &val)
+template < class T, class Cmp > bool khalikov::RBTree< T, Cmp >::insert(const T &val)
 {
   TreeNode< T, Cmp > *z = new TreeNode< T, Cmp >(val);
   TreeNode< T, Cmp > *y = nullptr;
@@ -104,8 +96,7 @@ bool khalikov::RBTree< T, Cmp >::insert(const T &val)
   return true;
 }
 
-template< class T, class Cmp >
-void khalikov::RBTree< T, Cmp >::fixInsert(TreeNode< T, Cmp > *x)
+template < class T, class Cmp > void khalikov::RBTree< T, Cmp >::fixInsert(TreeNode< T, Cmp > *x)
 {
   while (x != root && x->parent->color == 'R') {
     TreeNode< T, Cmp > *p = x->parent;
@@ -117,8 +108,7 @@ void khalikov::RBTree< T, Cmp >::fixInsert(TreeNode< T, Cmp > *x)
         u->color = 'B';
         g->color = 'R';
         x = g;
-      }
-      else {
+      } else {
         if (x == p->right) {
           x = p;
           rotateLeft(x);
@@ -128,16 +118,14 @@ void khalikov::RBTree< T, Cmp >::fixInsert(TreeNode< T, Cmp > *x)
         g->color = 'R';
         rotateRight(g);
       }
-    }
-    else {
+    } else {
       TreeNode< T, Cmp > *u = g->left;
       if (u && u->color == 'R') {
         p->color = 'B';
         u->color = 'B';
         g->color = 'R';
         x = g;
-      }
-      else {
+      } else {
         if (x == p->left) {
           x = p;
           rotateRight(x);
@@ -152,8 +140,7 @@ void khalikov::RBTree< T, Cmp >::fixInsert(TreeNode< T, Cmp > *x)
   root->color = 'B';
 }
 
-template< class T, class Cmp >
-bool khalikov::RBTree< T, Cmp >::remove(const T &val)
+template < class T, class Cmp > bool khalikov::RBTree< T, Cmp >::remove(const T &val)
 {
   TreeNode< T, Cmp > *z = root;
   while (z && (cmp(val, z->data) || cmp(z->data, val))) {
@@ -200,12 +187,12 @@ bool khalikov::RBTree< T, Cmp >::remove(const T &val)
   return true;
 }
 
-template< class T, class Cmp >
+template < class T, class Cmp >
 void khalikov::RBTree< T, Cmp >::fixDelete(TreeNode< T, Cmp > *x, TreeNode< T, Cmp > *xParent)
 {
   while (x != root && (!x || x->color == 'B')) {
     if (x == xParent->left) {
-      TreeNode< T, Cmp> *s = xParent->right;
+      TreeNode< T, Cmp > *s = xParent->right;
       if (s && s->color == 'R') {
         s->color = 'B';
         xParent->color = 'R';
@@ -218,8 +205,7 @@ void khalikov::RBTree< T, Cmp >::fixDelete(TreeNode< T, Cmp > *x, TreeNode< T, C
         }
         x = xParent;
         xParent = x->parent;
-      }
-      else {
+      } else {
         if (!s->right || s->right->color == 'B') {
           if (s->left) {
             s->left->color = 'B';
@@ -238,8 +224,7 @@ void khalikov::RBTree< T, Cmp >::fixDelete(TreeNode< T, Cmp > *x, TreeNode< T, C
         rotateLeft(xParent);
         x = root;
       }
-    }
-    else {
+    } else {
       TreeNode< T, Cmp > *s = xParent->left;
       if (s && s->color == 'R') {
         s->color = 'B';
@@ -253,8 +238,7 @@ void khalikov::RBTree< T, Cmp >::fixDelete(TreeNode< T, Cmp > *x, TreeNode< T, C
         }
         x = xParent;
         xParent = x->parent;
-      }
-      else {
+      } else {
         if (!s->left || s->left->color == 'B') {
           if (s->right) {
             s->right->color = 'B';
@@ -280,8 +264,8 @@ void khalikov::RBTree< T, Cmp >::fixDelete(TreeNode< T, Cmp > *x, TreeNode< T, C
   }
 }
 
-template< class T, class Cmp >
-khalikov::TreeNode< T, Cmp >* khalikov::RBTree< T, Cmp >::fullLeft(TreeNode< T, Cmp > *node)
+template < class T, class Cmp >
+khalikov::TreeNode< T, Cmp > *khalikov::RBTree< T, Cmp >::fullLeft(TreeNode< T, Cmp > *node)
 {
   while (node && node->left) {
     node = node->left;
@@ -289,7 +273,7 @@ khalikov::TreeNode< T, Cmp >* khalikov::RBTree< T, Cmp >::fullLeft(TreeNode< T, 
   return node;
 }
 
-template< class T, class Cmp >
+template < class T, class Cmp >
 void khalikov::RBTree< T, Cmp >::transplant(TreeNode< T, Cmp > *u, TreeNode< T, Cmp > *v)
 {
   if (!u->parent) {
@@ -304,8 +288,7 @@ void khalikov::RBTree< T, Cmp >::transplant(TreeNode< T, Cmp > *u, TreeNode< T, 
   }
 }
 
-template< class T, class Cmp >
-void khalikov::RBTree< T, Cmp >::rotateRight(TreeNode< T, Cmp > *x)
+template < class T, class Cmp > void khalikov::RBTree< T, Cmp >::rotateRight(TreeNode< T, Cmp > *x)
 {
   TreeNode< T, Cmp > *y = x->left;
   x->left = y->right;
@@ -317,8 +300,7 @@ void khalikov::RBTree< T, Cmp >::rotateRight(TreeNode< T, Cmp > *x)
   x->parent = y;
 }
 
-template< class T, class Cmp >
-void khalikov::RBTree< T, Cmp >::rotateLeft(TreeNode< T, Cmp > *x)
+template < class T, class Cmp > void khalikov::RBTree< T, Cmp >::rotateLeft(TreeNode< T, Cmp > *x)
 {
   TreeNode< T, Cmp > *y = x->right;
   x->right = y->left;
@@ -330,20 +312,19 @@ void khalikov::RBTree< T, Cmp >::rotateLeft(TreeNode< T, Cmp > *x)
   x->parent = y;
 }
 
-template< class T, class Cmp >
-khalikov::RBTree< T, Cmp >::RBTree() :
+template < class T, class Cmp >
+khalikov::RBTree< T, Cmp >::RBTree():
   root(nullptr),
   cmp()
 {}
 
-template< class T, class Cmp >
-khalikov::RBTree< T, Cmp >::~RBTree()
+template < class T, class Cmp > khalikov::RBTree< T, Cmp >::~RBTree()
 {
   clear(root);
   root = nullptr;
 }
 
-template< class T, class Cmp >
+template < class T, class Cmp >
 khalikov::RBTree< T, Cmp >::RBTree(const RBTree &rhs):
   root(nullptr),
   cmp(rhs.cmp)
@@ -351,16 +332,15 @@ khalikov::RBTree< T, Cmp >::RBTree(const RBTree &rhs):
   root = copy(rhs.root, nullptr);
 }
 
-template< class T, class Cmp >
-khalikov::RBTree< T, Cmp >::RBTree(RBTree &&rhs) noexcept :
+template < class T, class Cmp >
+khalikov::RBTree< T, Cmp >::RBTree(RBTree &&rhs) noexcept:
   root(nullptr),
   cmp(std::move(rhs.cmp))
 {
   swap(rhs);
 }
 
-template< class T, class Cmp >
-khalikov::RBTree< T, Cmp >& khalikov::RBTree< T, Cmp >::operator=(const RBTree &rhs)
+template < class T, class Cmp > khalikov::RBTree< T, Cmp > &khalikov::RBTree< T, Cmp >::operator=(const RBTree &rhs)
 {
   if (this != std::addressof(rhs)) {
     RBTree temp(rhs);
@@ -369,8 +349,7 @@ khalikov::RBTree< T, Cmp >& khalikov::RBTree< T, Cmp >::operator=(const RBTree &
   return *this;
 }
 
-template< class T, class Cmp >
-khalikov::RBTree< T, Cmp >& khalikov::RBTree< T, Cmp >::operator=(RBTree &&rhs) noexcept
+template < class T, class Cmp > khalikov::RBTree< T, Cmp > &khalikov::RBTree< T, Cmp >::operator=(RBTree &&rhs) noexcept
 {
   if (this != std::addressof(rhs)) {
     clear(root);
@@ -380,8 +359,7 @@ khalikov::RBTree< T, Cmp >& khalikov::RBTree< T, Cmp >::operator=(RBTree &&rhs) 
   return *this;
 }
 
-template< class T, class Cmp >
-void khalikov::RBTree< T, Cmp >::clear(TreeNode< T, Cmp > *node)
+template < class T, class Cmp > void khalikov::RBTree< T, Cmp >::clear(TreeNode< T, Cmp > *node)
 {
   if (!node) {
     return;
@@ -391,14 +369,14 @@ void khalikov::RBTree< T, Cmp >::clear(TreeNode< T, Cmp > *node)
   delete node;
 }
 
-template< class T, class Cmp >
-bool khalikov::RBTree< T, Cmp >::empty() const noexcept
+template < class T, class Cmp > bool khalikov::RBTree< T, Cmp >::empty() const noexcept
 {
   return root == nullptr;
 }
 
-template< class T, class Cmp >
-khalikov::TreeNode< T, Cmp >* khalikov::RBTree< T, Cmp >::copy(TreeNode< T, Cmp > *node, TreeNode< T, Cmp > *parent) {
+template < class T, class Cmp >
+khalikov::TreeNode< T, Cmp > *khalikov::RBTree< T, Cmp >::copy(TreeNode< T, Cmp > *node, TreeNode< T, Cmp > *parent)
+{
   if (!node) {
     return nullptr;
   }
@@ -410,12 +388,10 @@ khalikov::TreeNode< T, Cmp >* khalikov::RBTree< T, Cmp >::copy(TreeNode< T, Cmp 
   return newNode;
 }
 
-template< class T, class Cmp >
-void khalikov::RBTree< T, Cmp >::swap(RBTree &rhs) noexcept
+template < class T, class Cmp > void khalikov::RBTree< T, Cmp >::swap(RBTree &rhs) noexcept
 {
   std::swap(root, rhs.root);
   std::swap(cmp, rhs.cmp);
 }
-
 
 #endif
