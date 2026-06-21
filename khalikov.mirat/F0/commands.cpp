@@ -1,30 +1,33 @@
 #include "commands.hpp"
 #include <sstream>
 
-namespace khalikov {
-	const khalikov::Matrix *find(const Storage &storage, const std::string &name) {
-	  for (auto it = storage.cbegin(); it != storage.cend(); ++it) {
-	    if ((*it).first == name) {
-	      return &((*it).second);
-	    }
-	  }
-	  return nullptr;
-	}
+namespace khalikov
+{
+  const khalikov::Matrix *find(const Storage &storage, const std::string &name)
+  {
+    for (auto it = storage.cbegin(); it != storage.cend(); ++it) {
+      if ((*it).first == name) {
+        return &((*it).second);
+      }
+    }
+    return nullptr;
+  }
 
-	khalikov::Matrix *find(Storage &storage, const std::string &name) {
-	  for (auto it = storage.begin(); it != storage.end(); ++it) {
-	    if ((*it).first == name) {
-	      return &((*it).second);
-	    }
-	  }
-	  return nullptr;
-	}
+  khalikov::Matrix *find(Storage &storage, const std::string &name)
+  {
+    for (auto it = storage.begin(); it != storage.end(); ++it) {
+      if ((*it).first == name) {
+        return &((*it).second);
+      }
+    }
+    return nullptr;
+  }
 
   void checkInput(std::istream &in)
   {
     while (in.peek() != '\n' && in.peek() != EOF) {
       char ch = in.peek();
-      if(!std::isspace(ch)) {
+      if (!std::isspace(ch)) {
         throw std::invalid_argument("Signature of command is failed");
       }
       in.get();
@@ -34,7 +37,8 @@ namespace khalikov {
     }
   }
 
-  long long detImpl(const khalikov::Matrix &matrix, int &sign) {
+  long long detImpl(const khalikov::Matrix &matrix, int &sign)
+  {
     size_t n = matrix.getRows();
     khalikov::Vector< khalikov::Vector< long long > > a;
     a.resize(n);
@@ -70,7 +74,8 @@ namespace khalikov {
     return a[n - 1][n - 1];
   }
 
-  void det(std::ostream &out, std::istream &in, Storage &storage) {
+  void det(std::ostream &out, std::istream &in, Storage &storage)
+  {
     std::string name;
     if (!(in >> name)) {
       throw std::invalid_argument("Input error");
@@ -94,27 +99,27 @@ namespace khalikov {
     out << result << "\n";
   }
 
-	void create(std::ostream &, std::istream &in, Storage &storage)
-	{
-	  std::string line;
-	  if (!std::getline(in, line)) {
-	    throw std::invalid_argument("Input error");
-	  }
-	  std::stringstream ss(line);
-	  std::string name;
-	  size_t rows = 0, cols = 0;
-	  int base = 10;
-	  if (!(ss >> name >> rows >> cols)) {
-	    throw std::invalid_argument("Input error");
-	  }
-	  ss >> base;
-	  checkInput(ss);
-	  if (find(storage, name) != nullptr) {
-	    throw std::runtime_error("Already exists");
-	  }
-	  khalikov::Matrix matrix(rows, cols, base);
-	  storage.insert(std::make_pair(name, std::move(matrix)));
-	}
+  void create(std::ostream &, std::istream &in, Storage &storage)
+  {
+    std::string line;
+    if (!std::getline(in, line)) {
+      throw std::invalid_argument("Input error");
+    }
+    std::stringstream ss(line);
+    std::string name;
+    size_t rows = 0, cols = 0;
+    int base = 10;
+    if (!(ss >> name >> rows >> cols)) {
+      throw std::invalid_argument("Input error");
+    }
+    ss >> base;
+    checkInput(ss);
+    if (find(storage, name) != nullptr) {
+      throw std::runtime_error("Already exists");
+    }
+    khalikov::Matrix matrix(rows, cols, base);
+    storage.insert(std::make_pair(name, std::move(matrix)));
+  }
 
   void fill(std::ostream &, std::istream &in, Storage &storage)
   {
@@ -260,7 +265,8 @@ namespace khalikov {
     storage.insert(std::make_pair(resName, std::move(result)));
   }
 
-  void remove(std::ostream &out, std::istream &in, Storage &storage) {
+  void remove(std::ostream &out, std::istream &in, Storage &storage)
+  {
     std::string name;
     if (!(in >> name)) {
       throw std::invalid_argument("Input error");
@@ -270,7 +276,7 @@ namespace khalikov {
     if (!mx) {
       throw std::runtime_error("Matrix not found");
     }
-    std::pair<std::string, Matrix> target(name, *mx);
+    std::pair< std::string, Matrix > target(name, *mx);
     storage.remove(target);
     out << "<" << name << " WAS DELETED>\n";
   }
@@ -338,24 +344,24 @@ namespace khalikov {
   void scale(std::ostream &, std::istream &in, Storage &storage)
   {
     std::string name;
-	  long long num = 0;
-	  if (!(in >> name >> num)) {
-	    throw std::invalid_argument("Input error");
-	  }
-	  checkInput(in);
-	  Matrix *matrix = find(storage, name);
-	  if (!matrix) {
-	    throw std::runtime_error("Matrix not found");
-	  }
-	  size_t r = matrix->getRows();
-	  size_t c = matrix->getCols();
-	  for (size_t i = 0; i < r; ++i) {
-	    for (size_t j = 0; j < c; ++j) {
+    long long num = 0;
+    if (!(in >> name >> num)) {
+      throw std::invalid_argument("Input error");
+    }
+    checkInput(in);
+    Matrix *matrix = find(storage, name);
+    if (!matrix) {
+      throw std::runtime_error("Matrix not found");
+    }
+    size_t r = matrix->getRows();
+    size_t c = matrix->getCols();
+    for (size_t i = 0; i < r; ++i) {
+      for (size_t j = 0; j < c; ++j) {
         Matrix::check((*matrix)[i][j], num, '*');
-	      (*matrix)[i][j] *= num;
-	    }
-	  }
-	}
+        (*matrix)[i][j] *= num;
+      }
+    }
+  }
 
   void eye(std::ostream &, std::istream &in, Storage &storage)
   {
@@ -381,7 +387,8 @@ namespace khalikov {
     storage.insert(std::make_pair(name, result));
   }
 
-  void rotateR(std::ostream &, std::istream &in, Storage &storage) {
+  void rotateR(std::ostream &, std::istream &in, Storage &storage)
+  {
     std::string name;
     if (!(in >> name)) {
       throw std::invalid_argument("Input error");
@@ -399,12 +406,13 @@ namespace khalikov {
         result[j][r - 1 - i] = (*matrix)[i][j];
       }
     }
-    std::pair<std::string, Matrix> target(name, *matrix);
+    std::pair< std::string, Matrix > target(name, *matrix);
     storage.remove(target);
     storage.insert(std::make_pair(name, result));
   }
 
-  void rotateL(std::ostream &, std::istream &in, Storage &storage) {
+  void rotateL(std::ostream &, std::istream &in, Storage &storage)
+  {
     std::string name;
     if (!(in >> name)) {
       throw std::invalid_argument("Input error");
@@ -422,12 +430,13 @@ namespace khalikov {
         result[c - 1 - j][i] = (*matrix)[i][j];
       }
     }
-    std::pair<std::string, Matrix> target(name, *matrix);
+    std::pair< std::string, Matrix > target(name, *matrix);
     storage.remove(target);
     storage.insert(std::make_pair(name, result));
   }
 
-  void square(std::ostream &, std::istream &in, Storage &storage) {
+  void square(std::ostream &, std::istream &in, Storage &storage)
+  {
     std::string name;
     if (!(in >> name)) {
       throw std::invalid_argument("Input error");
@@ -450,7 +459,7 @@ namespace khalikov {
         }
       }
     }
-    std::pair<std::string, Matrix> target(name, *matrix);
+    std::pair< std::string, Matrix > target(name, *matrix);
     storage.remove(target);
     storage.insert(std::make_pair(name, std::move(result)));
   }
@@ -517,7 +526,8 @@ namespace khalikov {
     storage.insert(std::make_pair(res, std::move(result)));
   }
 
-  void swapR(std::ostream &, std::istream &in, Storage &storage) {
+  void swapR(std::ostream &, std::istream &in, Storage &storage)
+  {
     std::string name;
     size_t r1 = 0, r2 = 0;
     if (!(in >> name >> r1 >> r2)) {
@@ -537,7 +547,8 @@ namespace khalikov {
     }
   }
 
-  void swapC(std::ostream &, std::istream &in, Storage &storage) {
+  void swapC(std::ostream &, std::istream &in, Storage &storage)
+  {
     std::string name;
     size_t c1 = 0, c2 = 0;
     if (!(in >> name >> c1 >> c2)) {
@@ -557,7 +568,8 @@ namespace khalikov {
     }
   }
 
-  void reshape(std::ostream &, std::istream &in, Storage &storage) {
+  void reshape(std::ostream &, std::istream &in, Storage &storage)
+  {
     std::string name;
     size_t newRows = 0, newCols = 0;
     if (!(in >> name >> newRows >> newCols)) {
@@ -581,12 +593,13 @@ namespace khalikov {
       size_t newC = k % newCols;
       result[newR][newC] = (*matrix)[oldR][oldC];
     }
-    std::pair<std::string, Matrix> target(name, *matrix);
+    std::pair< std::string, Matrix > target(name, *matrix);
     storage.remove(target);
     storage.insert(std::make_pair(name, std::move(result)));
   }
 
-  void splitH(std::ostream &, std::istream &in, Storage &storage) {
+  void splitH(std::ostream &, std::istream &in, Storage &storage)
+  {
     std::string res1, res2, name;
     size_t colIdx = 0;
     if (!(in >> res1 >> res2 >> name >> colIdx)) {
@@ -617,7 +630,8 @@ namespace khalikov {
     storage.insert(std::make_pair(res2, std::move(m2)));
   }
 
-  void splitV(std::ostream &, std::istream &in, Storage &storage) {
+  void splitV(std::ostream &, std::istream &in, Storage &storage)
+  {
     std::string res1, res2, name;
     size_t rowIdx = 0;
     if (!(in >> res1 >> res2 >> name >> rowIdx)) {

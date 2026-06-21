@@ -282,7 +282,7 @@ khalikov::TreeNode< T, Cmp > *khalikov::RBTree< T, Cmp >::fullLeft(TreeNode< T, 
   return node;
 }
 
-template< typename T, typename Cmp >
+template < typename T, typename Cmp >
 const khalikov::TreeNode< T, Cmp > *khalikov::RBTree< T, Cmp >::fullLeft(const TreeNode< T, Cmp > *node) const
 {
   while (node && node->left) {

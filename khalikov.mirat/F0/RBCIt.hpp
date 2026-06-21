@@ -5,8 +5,7 @@
 
 namespace khalikov
 {
-  template < class T, class Cmp >
-  struct RBCIt
+  template < class T, class Cmp > struct RBCIt
   {
     RBCIt();
     explicit RBCIt(const TreeNode< T, Cmp > *node);

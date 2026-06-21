@@ -6,13 +6,11 @@
 #include "../common/hashtable.hpp"
 #include "../common/hasher.hpp"
 
-auto f = std::bind(
-    std::less< std::string >(),
-    std::bind(&pair_t::first, std::placeholders::_1),
-    std::bind(&pair_t::first, std::placeholders::_2)
-);
+auto f = std::bind(std::less< std::string >(), std::bind(&pair_t::first, std::placeholders::_1),
+                   std::bind(&pair_t::first, std::placeholders::_2));
 
-using hash_t = khalikov::HashTable< std::string, cmd_t, khalikov::SipHash< std::string >, std::equal_to< std::string > >;
+using hash_t =
+    khalikov::HashTable< std::string, cmd_t, khalikov::SipHash< std::string >, std::equal_to< std::string > >;
 
 int main()
 {
