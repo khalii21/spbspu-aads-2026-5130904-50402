@@ -21,8 +21,11 @@ int main()
   cmds["create"] = khalikov::create;
   cmds["show"] = khalikov::show;
   cmds["fill"] = khalikov::fill;
+  cmds["add"] = khalikov::add;
+  cmds["mul"] = khalikov::mul;
+  cmds["sub"] = khalikov::sub;
   std::string cmd;
-  while (std::cin >> cmd) {
+  while (std::cin >> std::ws >> cmd) {
     try {
       cmds.at(cmd)(std::cout, std::cin, mxs);
     } catch (...) {

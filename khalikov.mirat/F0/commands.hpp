@@ -21,6 +21,10 @@ namespace khalikov {
   void create(std::ostream &, std::istream &in, Storage &storage);
   void fill(std::ostream &, std::istream &in, Storage &storage);
   void show(std::ostream &out, std::istream &in, Storage &storage);
+  void add(std::ostream &, std::istream &in, Storage &storage);
+  void mul(std::ostream &, std::istream &in, Storage &storage);
+  void sub(std::ostream &, std::istream &in, Storage &storage);
+
 
 }
 
