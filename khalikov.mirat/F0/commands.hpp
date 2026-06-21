@@ -33,6 +33,13 @@ namespace khalikov {
   void det(std::ostream &, std::istream &in, Storage &storage);
   void eye(std::ostream &, std::istream &in, Storage &storage);
   void rotateR(std::ostream &, std::istream &in, Storage &storage);
+  void rotateL(std::ostream &, std::istream &in, Storage &storage);
+  void square(std::ostream &, std::istream &in, Storage &storage);
+  void mergeV(std::ostream &, std::istream &in, Storage &storage);
+  void mergeH(std::ostream &, std::istream &in, Storage &storage);
+  void swapC(std::ostream &, std::istream &in, Storage &storage);
+  void swapR(std::ostream &, std::istream &in, Storage &storage);
+
 }
 
 #endif

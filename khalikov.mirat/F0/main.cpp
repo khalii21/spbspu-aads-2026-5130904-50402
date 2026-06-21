@@ -33,6 +33,12 @@ int main()
   cmds["scale"] = khalikov::scale;
   cmds["det"] = khalikov::det;
   cmds["rotate-r"] = khalikov::rotateR;
+  cmds["rotate-l"] = khalikov::rotateL;
+  cmds["merge-v"] = khalikov::mergeV;
+  cmds["merge-h"] = khalikov::mergeH;
+  cmds["swap-r"] = khalikov::swapR;
+  cmds["swap-c"] = khalikov::swapC;
+  cmds["square"] = khalikov::square;
   std::string cmd;
   while (std::cin >> std::ws >> cmd) {
     try {

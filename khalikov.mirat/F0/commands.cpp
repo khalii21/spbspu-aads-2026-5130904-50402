@@ -404,4 +404,157 @@ namespace khalikov {
     storage.insert(std::make_pair(name, result));
   }
 
+  void rotateL(std::ostream &, std::istream &in, Storage &storage) {
+    std::string name;
+    if (!(in >> name)) {
+      throw std::invalid_argument("Input error");
+    }
+    checkInput(in);
+    const Matrix *matrix = find(storage, name);
+    if (!matrix) {
+      throw std::runtime_error("Matrix not found");
+    }
+    size_t r = matrix->getRows();
+    size_t c = matrix->getCols();
+    khalikov::Matrix result(c, r, matrix->getBase());
+    for (size_t i = 0; i < r; ++i) {
+      for (size_t j = 0; j < c; ++j) {
+        result[c - 1 - j][i] = (*matrix)[i][j];
+      }
+    }
+    std::pair<std::string, Matrix> target(name, *matrix);
+    storage.remove(target);
+    storage.insert(std::make_pair(name, result));
+  }
+
+  void square(std::ostream &, std::istream &in, Storage &storage) {
+    std::string name;
+    if (!(in >> name)) {
+      throw std::invalid_argument("Input error");
+    }
+    checkInput(in);
+    const Matrix *matrix = find(storage, name);
+    if (!matrix) {
+      throw std::runtime_error("Matrix not found");
+    }
+    size_t r = matrix->getRows();
+    size_t c = matrix->getCols();
+    size_t k = std::max(r, c);
+    khalikov::Matrix result(k, k, matrix->getBase());
+    for (size_t i = 0; i < k; ++i) {
+      for (size_t j = 0; j < k; ++j) {
+        if (i < r && j < c) {
+          result[i][j] = (*matrix)[i][j];
+        } else {
+          result[i][j] = 0;
+        }
+      }
+    }
+    std::pair<std::string, Matrix> target(name, *matrix);
+    storage.remove(target);
+    storage.insert(std::make_pair(name, std::move(result)));
+  }
+
+  void mergeH(std::ostream &, std::istream &in, Storage &storage)
+  {
+    std::string res, arg1, arg2;
+    if (!(in >> res >> arg1 >> arg2)) {
+      throw std::invalid_argument("Input error");
+    }
+    checkInput(in);
+    const Matrix *m1 = find(storage, arg1);
+    const Matrix *m2 = find(storage, arg2);
+    if (!m1 || !m2) {
+      throw std::runtime_error("Matrix not found");
+    }
+    if (m1->getRows() != m2->getRows()) {
+      throw std::invalid_argument("Impossible to do");
+    }
+    size_t rows = m1->getRows();
+    size_t cols1 = m1->getCols();
+    size_t cols2 = m2->getCols();
+    khalikov::Matrix result(rows, cols1 + cols2, 10);
+    for (size_t i = 0; i < rows; ++i) {
+      for (size_t j = 0; j < cols1 + cols2; ++j) {
+        if (j < cols1) {
+          result[i][j] = (*m1)[i][j];
+        } else {
+          result[i][j] = (*m2)[i][j - cols1];
+        }
+      }
+    }
+    storage.insert(std::make_pair(res, std::move(result)));
+  }
+
+  void mergeV(std::ostream &, std::istream &in, Storage &storage)
+  {
+    std::string res, arg1, arg2;
+    if (!(in >> res >> arg1 >> arg2)) {
+      throw std::invalid_argument("Input error");
+    }
+    checkInput(in);
+    const Matrix *m1 = find(storage, arg1);
+    const Matrix *m2 = find(storage, arg2);
+    if (!m1 || !m2) {
+      throw std::runtime_error("Matrix not found");
+    }
+    if (m1->getCols() != m2->getCols()) {
+      throw std::invalid_argument("Impossible to do");
+    }
+    size_t cols = m1->getCols();
+    size_t rows1 = m1->getRows();
+    size_t rows2 = m2->getRows();
+    khalikov::Matrix result(rows1 + rows2, cols, 10);
+    for (size_t i = 0; i < rows1 + rows2; ++i) {
+      for (size_t j = 0; j < cols; ++j) {
+        if (i < rows1) {
+          result[i][j] = (*m1)[i][j];
+        } else {
+          result[i][j] = (*m2)[i - rows1][j];
+        }
+      }
+    }
+    storage.insert(std::make_pair(res, std::move(result)));
+  }
+
+  void swapR(std::ostream &, std::istream &in, Storage &storage) {
+    std::string name;
+    size_t r1 = 0, r2 = 0;
+    if (!(in >> name >> r1 >> r2)) {
+      throw std::invalid_argument("Input error");
+    }
+    checkInput(in);
+    Matrix *matrix = find(storage, name);
+    if (!matrix) {
+      throw std::runtime_error("Matrix not found");
+    }
+    size_t rows = matrix->getRows();
+    if (r1 >= rows || r2 >= rows) {
+      throw std::invalid_argument("Impossible to do");
+    }
+    for (size_t j = 0; j < matrix->getCols(); ++j) {
+      std::swap((*matrix)[r1][j], (*matrix)[r2][j]);
+    }
+  }
+
+  void swapC(std::ostream &, std::istream &in, Storage &storage) {
+    std::string name;
+    size_t c1 = 0, c2 = 0;
+    if (!(in >> name >> c1 >> c2)) {
+      throw std::invalid_argument("Input error");
+    }
+    checkInput(in);
+    Matrix *matrix = find(storage, name);
+    if (!matrix) {
+      throw std::runtime_error("Matrix not found");
+    }
+    size_t cols = matrix->getCols();
+    if (c1 >= cols || c2 >= cols) {
+      throw std::invalid_argument("Impossible to do");
+    }
+    for (size_t i = 0; i < matrix->getRows(); ++i) {
+      std::swap((*matrix)[i][c1], (*matrix)[i][c2]);
+    }
+  }
+
 }
