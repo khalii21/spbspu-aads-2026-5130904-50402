@@ -557,4 +557,95 @@ namespace khalikov {
     }
   }
 
+  void reshape(std::ostream &, std::istream &in, Storage &storage) {
+    std::string name;
+    size_t newRows = 0, newCols = 0;
+    if (!(in >> name >> newRows >> newCols)) {
+      throw std::invalid_argument("Input error");
+    }
+    checkInput(in);
+    Matrix *matrix = find(storage, name);
+    if (!matrix) {
+      throw std::runtime_error("Matrix not found");
+    }
+    size_t oldRows = matrix->getRows();
+    size_t oldCols = matrix->getCols();
+    if (oldRows * oldCols != newRows * newCols) {
+      throw std::invalid_argument("Impossible to do");
+    }
+    khalikov::Matrix result(newRows, newCols, matrix->getBase());
+    for (size_t k = 0; k < oldRows * oldCols; ++k) {
+      size_t oldR = k / oldCols;
+      size_t oldC = k % oldCols;
+      size_t newR = k / newCols;
+      size_t newC = k % newCols;
+      result[newR][newC] = (*matrix)[oldR][oldC];
+    }
+    std::pair<std::string, Matrix> target(name, *matrix);
+    storage.remove(target);
+    storage.insert(std::make_pair(name, std::move(result)));
+  }
+
+  void splitH(std::ostream &, std::istream &in, Storage &storage) {
+    std::string res1, res2, name;
+    size_t colIdx = 0;
+    if (!(in >> res1 >> res2 >> name >> colIdx)) {
+      throw std::invalid_argument("Input error");
+    }
+    checkInput(in);
+    const Matrix *matrix = find(storage, name);
+    if (!matrix) {
+      throw std::runtime_error("Matrix not found");
+    }
+    size_t rows = matrix->getRows();
+    size_t cols = matrix->getCols();
+    if (colIdx == 0 || colIdx >= cols) {
+      throw std::invalid_argument("Impossible to do");
+    }
+    khalikov::Matrix m1(rows, colIdx, matrix->getBase());
+    khalikov::Matrix m2(rows, cols - colIdx, matrix->getBase());
+    for (size_t i = 0; i < rows; ++i) {
+      for (size_t j = 0; j < cols; ++j) {
+        if (j < colIdx) {
+          m1[i][j] = (*matrix)[i][j];
+        } else {
+          m2[i][j - colIdx] = (*matrix)[i][j];
+        }
+      }
+    }
+    storage.insert(std::make_pair(res1, std::move(m1)));
+    storage.insert(std::make_pair(res2, std::move(m2)));
+  }
+
+  void splitV(std::ostream &, std::istream &in, Storage &storage) {
+    std::string res1, res2, name;
+    size_t rowIdx = 0;
+    if (!(in >> res1 >> res2 >> name >> rowIdx)) {
+      throw std::invalid_argument("Input error");
+    }
+    checkInput(in);
+    const Matrix *matrix = find(storage, name);
+    if (!matrix) {
+      throw std::runtime_error("Matrix not found");
+    }
+    size_t rows = matrix->getRows();
+    size_t cols = matrix->getCols();
+    if (rowIdx == 0 || rowIdx >= rows) {
+      throw std::invalid_argument("Impossible to do");
+    }
+    khalikov::Matrix m1(rowIdx, cols, matrix->getBase());
+    khalikov::Matrix m2(rows - rowIdx, cols, matrix->getBase());
+    for (size_t i = 0; i < rows; ++i) {
+      for (size_t j = 0; j < cols; ++j) {
+        if (i < rowIdx) {
+          m1[i][j] = (*matrix)[i][j];
+        } else {
+          m2[i - rowIdx][j] = (*matrix)[i][j];
+        }
+      }
+    }
+    storage.insert(std::make_pair(res1, std::move(m1)));
+    storage.insert(std::make_pair(res2, std::move(m2)));
+  }
+
 }

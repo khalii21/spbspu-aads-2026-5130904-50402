@@ -39,6 +39,9 @@ int main()
   cmds["swap-r"] = khalikov::swapR;
   cmds["swap-c"] = khalikov::swapC;
   cmds["square"] = khalikov::square;
+  cmds["split-v"] = khalikov::splitV;
+  cmds["split-h"] = khalikov::splitH;
+  cmds["reshape"] = khalikov::reshape;
   std::string cmd;
   while (std::cin >> std::ws >> cmd) {
     try {

@@ -39,7 +39,9 @@ namespace khalikov {
   void mergeH(std::ostream &, std::istream &in, Storage &storage);
   void swapC(std::ostream &, std::istream &in, Storage &storage);
   void swapR(std::ostream &, std::istream &in, Storage &storage);
-
+  void splitH(std::ostream &, std::istream &in, Storage &storage);
+  void splitV(std::ostream &, std::istream &in, Storage &storage);
+  void reshape(std::ostream &, std::istream &in, Storage &storage);
 }
 
 #endif
