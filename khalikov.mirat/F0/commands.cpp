@@ -20,6 +20,19 @@ namespace khalikov {
 	  return nullptr;
 	}
 
+  void checkInput(std::istream &in)
+  {
+    while (in.peek() != '\n' && in.peek() != EOF) {
+      char ch = in.peek();
+      if(!std::isspace(ch)) {
+        throw std::invalid_argument("Signature of command is failed");
+      }
+      in.get();
+    }
+    if (in.peek() == '\n') {
+      in.get();
+    }
+  }
 
 	void create(std::ostream &, std::istream &in, Storage &storage)
 	{
@@ -35,10 +48,61 @@ namespace khalikov {
 	    throw std::invalid_argument("Input error");
 	  }
 	  ss >> base;
+	  checkInput(ss);
 	  if (find(storage, name) != nullptr) {
 	    throw std::runtime_error("Already exists");
 	  }
 	  khalikov::Matrix matrix(rows, cols, base);
 	  storage.insert(std::make_pair(name, std::move(matrix)));
 	}
+
+  void fill(std::ostream &, std::istream &in, Storage &storage)
+  {
+    std::string name;
+    if (!(in >> name)) {
+      throw std::invalid_argument("Input error");
+    }
+    Matrix *matrix = find(storage, name);
+    if (!matrix) {
+      throw std::runtime_error("Unknown matrix");
+    }
+    size_t r = matrix->getRows();
+    size_t c = matrix->getCols();
+    int base = matrix->getBase();
+    for (size_t i = 0; i < r; ++i) {
+      for (size_t j = 0; j < c; ++j) {
+        std::string token;
+        if (!(in >> token)) {
+          throw std::invalid_argument("Input error");
+        }
+        (*matrix)[i][j] = matrix->stol(token, base);
+      }
+    }
+    checkInput(in);
+  }
+
+  void show(std::ostream &out, std::istream &in, Storage &storage)
+  {
+    std::string name;
+    if (!(in >> name)) {
+      throw std::invalid_argument("Input error");
+    }
+    const Matrix *matrix = find(storage, name);
+    if (!matrix) {
+      throw std::runtime_error("Unknown matrix");
+    }
+    checkInput(in);
+    size_t r = matrix->getRows();
+    size_t c = matrix->getCols();
+    int base = matrix->getBase();
+    for (size_t i = 0; i < r; ++i) {
+      for (size_t j = 0; j < c; ++j) {
+        out << matrix->ltos((*matrix)[i][j], base);
+        if (j + 1 < c) {
+          out << " ";
+        }
+      }
+      out << "\n";
+    }
+  }
 }

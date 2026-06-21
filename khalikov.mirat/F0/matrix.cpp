@@ -43,7 +43,7 @@ namespace khalikov {
 	  }
 	}
 
-	long long Matrix::stol(const std::string &str, int base)
+	long long Matrix::stol(const std::string &str, int base) const
 	{
 	  if (str.empty()) {
 	    throw std::invalid_argument("Empty string");
@@ -88,7 +88,7 @@ namespace khalikov {
 	  return isNegative ? -res : res;
 	}
 
-	std::string Matrix::ltos(long long num, int base)
+	std::string Matrix::ltos(long long num, int base) const
 	{
 	  if (num == 0) {
 	    return "0";

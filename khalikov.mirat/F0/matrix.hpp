@@ -29,8 +29,8 @@ namespace khalikov
     void setBase(int newBase);
     void swap(Matrix &other) noexcept;
 
-    long long stol(const std::string &str, int base);
-    std::string ltos(long long num, int base);
+    long long stol(const std::string &str, int base) const;
+    std::string ltos(long long num, int base) const;
     static void check(long long a, long long b, char op);
 
   private:

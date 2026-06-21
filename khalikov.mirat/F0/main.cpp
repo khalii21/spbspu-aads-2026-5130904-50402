@@ -19,6 +19,8 @@ int main()
   Storage mxs(f);
   hash_t cmds;
   cmds["create"] = khalikov::create;
+  cmds["show"] = khalikov::show;
+  cmds["fill"] = khalikov::fill;
   std::string cmd;
   while (std::cin >> cmd) {
     try {

@@ -16,8 +16,12 @@ using cmd_t = void(*)(std::ostream &, std::istream &, Storage &);
 namespace khalikov {
   const khalikov::Matrix *find(const Storage &storage, const std::string &name);
   khalikov::Matrix *find(Storage &storage, const std::string &name);
+  void checkInput(std::istream &in);
 
   void create(std::ostream &, std::istream &in, Storage &storage);
+  void fill(std::ostream &, std::istream &in, Storage &storage);
+  void show(std::ostream &out, std::istream &in, Storage &storage);
+
 }
 
 #endif
