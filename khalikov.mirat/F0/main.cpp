@@ -24,6 +24,9 @@ int main()
   cmds["add"] = khalikov::add;
   cmds["mul"] = khalikov::mul;
   cmds["sub"] = khalikov::sub;
+  cmds["remove"] = khalikov::remove;
+  cmds["list"] = khalikov::list;
+  cmds["clear"] = khalikov::clear;
   std::string cmd;
   while (std::cin >> std::ws >> cmd) {
     try {

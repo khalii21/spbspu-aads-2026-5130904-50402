@@ -200,4 +200,39 @@ namespace khalikov {
     storage.insert(std::make_pair(resName, std::move(result)));
   }
 
+  void remove(std::ostream &out, std::istream &in, Storage &storage) {
+    std::string name;
+    if (!(in >> name)) {
+      throw std::invalid_argument("Input error");
+    }
+    checkInput(in);
+    const Matrix *mx = find(storage, name);
+    if (!mx) {
+      throw std::runtime_error("Matrix not found");
+    }
+    std::pair<std::string, Matrix> target(name, *mx);
+    storage.remove(target);
+    out << "<" << name << " WAS DELETED>\n";
+  }
+
+  void clear(std::ostream &, std::istream &in, Storage &storage)
+  {
+    checkInput(in);
+    while (!storage.empty()) {
+      storage.remove(*(storage.begin()));
+    }
+  }
+
+  void list(std::ostream &out, std::istream &in, Storage &storage)
+  {
+    checkInput(in);
+    if (storage.empty()) {
+      out << "<EMPTY>\n";
+      return;
+    }
+    for (auto it = storage.cbegin(); it != storage.cend(); ++it) {
+      out << "<" << it->first << '\t' << it->second.getRows() << "x" << it->second.getCols() << ">\n";
+    }
+  }
+
 }

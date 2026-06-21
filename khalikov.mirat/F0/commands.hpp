@@ -24,8 +24,9 @@ namespace khalikov {
   void add(std::ostream &, std::istream &in, Storage &storage);
   void mul(std::ostream &, std::istream &in, Storage &storage);
   void sub(std::ostream &, std::istream &in, Storage &storage);
-
-
+  void remove(std::ostream &out, std::istream &in, Storage &storage);
+  void clear(std::ostream &, std::istream &in, Storage &storage);
+  void list(std::ostream &out, std::istream &in, Storage &storage);
 }
 
 #endif
