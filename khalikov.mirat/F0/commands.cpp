@@ -34,6 +34,66 @@ namespace khalikov {
     }
   }
 
+  long long detImpl(const khalikov::Matrix &matrix, int &sign) {
+    size_t n = matrix.getRows();
+    khalikov::Vector< khalikov::Vector< long long > > a;
+    a.resize(n);
+    for (size_t i = 0; i < n; ++i) {
+      a[i].resize(n);
+      for (size_t j = 0; j < n; ++j) {
+        a[i][j] = matrix[i][j];
+      }
+    }
+    long long prevPivot = 1;
+    for (size_t i = 0; i < n; ++i) {
+      size_t maxRow = i;
+      for (size_t k = i + 1; k < n; ++k) {
+        if (std::abs(a[k][i]) > std::abs(a[maxRow][i])) {
+          maxRow = k;
+        }
+      }
+      if (a[maxRow][i] == 0) {
+        return 0;
+      }
+      if (maxRow != i) {
+        std::swap(a[i], a[maxRow]);
+        sign = -sign;
+      }
+      long long pivot = a[i][i];
+      for (size_t k = i + 1; k < n; ++k) {
+        for (size_t j = i + 1; j < n; ++j) {
+          a[k][j] = (pivot * a[k][j] - a[k][i] * a[i][j]) / prevPivot;
+        }
+      }
+      prevPivot = pivot;
+    }
+    return a[n - 1][n - 1];
+  }
+
+  void det(std::ostream &out, std::istream &in, Storage &storage) {
+    std::string name;
+    if (!(in >> name)) {
+      throw std::invalid_argument("Input error");
+    }
+    checkInput(in);
+    const Matrix *matrix = find(storage, name);
+    if (!matrix) {
+      throw std::runtime_error("Matrix not found");
+    }
+    size_t n = matrix->getRows();
+    if (n != matrix->getCols()) {
+      throw std::invalid_argument("Matrix must be square");
+    }
+    if (n == 1) {
+      out << (*matrix)[0][0] << "\n";
+      return;
+    }
+    int sign = 1;
+    long long detVal = detImpl(*matrix, sign);
+    long long result = detVal * sign;
+    out << result << "\n";
+  }
+
 	void create(std::ostream &, std::istream &in, Storage &storage)
 	{
 	  std::string line;
@@ -233,6 +293,115 @@ namespace khalikov {
     for (auto it = storage.cbegin(); it != storage.cend(); ++it) {
       out << "<" << it->first << '\t' << it->second.getRows() << "x" << it->second.getCols() << ">\n";
     }
+  }
+
+  void basech(std::ostream &, std::istream &in, Storage &storage)
+  {
+    std::string name;
+    int newBase = 10;
+    if (!(in >> name >> newBase)) {
+      throw std::invalid_argument("Input error");
+    }
+    checkInput(in);
+    Matrix *matrix = find(storage, name);
+    if (!matrix) {
+      throw std::runtime_error("Matrix not found");
+    }
+    if (newBase < 2 || newBase > 36) {
+      throw std::invalid_argument("Invalid base");
+    }
+    matrix->setBase(newBase);
+  }
+
+  void transpose(std::ostream &, std::istream &in, Storage &storage)
+  {
+    std::string name;
+    if (!(in >> name)) {
+      throw std::invalid_argument("Input error");
+    }
+    checkInput(in);
+    Matrix *mx = find(storage, name);
+    if (!mx) {
+      throw std::runtime_error("Matrix not found");
+    }
+    size_t r = mx->getRows();
+    size_t c = mx->getCols();
+    Matrix result(c, r, mx->getBase());
+    for (size_t i = 0; i < r; ++i) {
+      for (size_t j = 0; j < c; ++j) {
+        result[j][i] = (*mx)[i][j];
+      }
+    }
+    mx->swap(result);
+  }
+
+  void scale(std::ostream &, std::istream &in, Storage &storage)
+  {
+    std::string name;
+	  long long num = 0;
+	  if (!(in >> name >> num)) {
+	    throw std::invalid_argument("Input error");
+	  }
+	  checkInput(in);
+	  Matrix *matrix = find(storage, name);
+	  if (!matrix) {
+	    throw std::runtime_error("Matrix not found");
+	  }
+	  size_t r = matrix->getRows();
+	  size_t c = matrix->getCols();
+	  for (size_t i = 0; i < r; ++i) {
+	    for (size_t j = 0; j < c; ++j) {
+        Matrix::check((*matrix)[i][j], num, '*');
+	      (*matrix)[i][j] *= num;
+	    }
+	  }
+	}
+
+  void eye(std::ostream &, std::istream &in, Storage &storage)
+  {
+    std::string name;
+    size_t n = 0;
+    if (!(in >> name >> n)) {
+      throw std::invalid_argument("Input error");
+    }
+    checkInput(in);
+    if (n == 0) {
+      throw std::invalid_argument("Input error");
+    }
+    khalikov::Matrix result(n, n, 10);
+    for (size_t i = 0; i < n; ++i) {
+      for (size_t j = 0; j < n; ++j) {
+        if (i == j) {
+          result[i][j] = 1;
+        } else {
+          result[i][j] = 0;
+        }
+      }
+    }
+    storage.insert(std::make_pair(name, result));
+  }
+
+  void rotateR(std::ostream &, std::istream &in, Storage &storage) {
+    std::string name;
+    if (!(in >> name)) {
+      throw std::invalid_argument("Input error");
+    }
+    checkInput(in);
+    const Matrix *matrix = find(storage, name);
+    if (!matrix) {
+      throw std::runtime_error("Matrix not found");
+    }
+    size_t r = matrix->getRows();
+    size_t c = matrix->getCols();
+    khalikov::Matrix result(c, r, matrix->getBase());
+    for (size_t i = 0; i < r; ++i) {
+      for (size_t j = 0; j < c; ++j) {
+        result[j][r - 1 - i] = (*matrix)[i][j];
+      }
+    }
+    std::pair<std::string, Matrix> target(name, *matrix);
+    storage.remove(target);
+    storage.insert(std::make_pair(name, result));
   }
 
 }

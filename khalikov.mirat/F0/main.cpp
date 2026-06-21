@@ -27,6 +27,12 @@ int main()
   cmds["remove"] = khalikov::remove;
   cmds["list"] = khalikov::list;
   cmds["clear"] = khalikov::clear;
+  cmds["basech"] = khalikov::basech;
+  cmds["transpose"] = khalikov::transpose;
+  cmds["eye"] = khalikov::eye;
+  cmds["scale"] = khalikov::scale;
+  cmds["det"] = khalikov::det;
+  cmds["rotate-r"] = khalikov::rotateR;
   std::string cmd;
   while (std::cin >> std::ws >> cmd) {
     try {

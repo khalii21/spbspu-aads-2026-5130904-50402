@@ -27,6 +27,12 @@ namespace khalikov {
   void remove(std::ostream &out, std::istream &in, Storage &storage);
   void clear(std::ostream &, std::istream &in, Storage &storage);
   void list(std::ostream &out, std::istream &in, Storage &storage);
+  void basech(std::ostream &, std::istream &in, Storage &storage);
+  void transpose(std::ostream &, std::istream &in, Storage &storage);
+  void scale(std::ostream &, std::istream &in, Storage &storage);
+  void det(std::ostream &, std::istream &in, Storage &storage);
+  void eye(std::ostream &, std::istream &in, Storage &storage);
+  void rotateR(std::ostream &, std::istream &in, Storage &storage);
 }
 
 #endif
