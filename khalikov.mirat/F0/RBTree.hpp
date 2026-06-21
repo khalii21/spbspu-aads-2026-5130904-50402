@@ -14,6 +14,7 @@ namespace khalikov
     using cit_t = khalikov::RBCIt< T, Cmp >;
 
     RBTree();
+    explicit RBTree(Cmp custom);
     ~RBTree();
     RBTree(const RBTree &rhs);
     RBTree(RBTree &&rhs) noexcept;
@@ -35,15 +36,23 @@ namespace khalikov
   private:
     TreeNode< T, Cmp > *root;
     Cmp cmp;
+
     TreeNode< T, Cmp > *copy(TreeNode< T, Cmp > *node, TreeNode< T, Cmp > *parent);
     void rotateLeft(TreeNode< T, Cmp > *x);
     void rotateRight(TreeNode< T, Cmp > *x);
     void fixInsert(TreeNode< T, Cmp > *x);
+    const TreeNode< T, Cmp > *fullLeft(const TreeNode< T, Cmp > *node) const;
     TreeNode< T, Cmp > *fullLeft(TreeNode< T, Cmp > *node);
     void transplant(TreeNode< T, Cmp > *u, TreeNode< T, Cmp > *v);
     void fixDelete(TreeNode< T, Cmp > *x, TreeNode< T, Cmp > *xParent);
   };
 }
+
+template < class T, class Cmp >
+khalikov::RBTree< T, Cmp >::RBTree(Cmp custom):
+  root(nullptr),
+  cmp(custom)
+{}
 
 template < class T, class Cmp >
 typename khalikov::RBTree< T, Cmp >::cit_t khalikov::RBTree< T, Cmp >::cbegin() const noexcept
@@ -266,6 +275,15 @@ void khalikov::RBTree< T, Cmp >::fixDelete(TreeNode< T, Cmp > *x, TreeNode< T, C
 
 template < class T, class Cmp >
 khalikov::TreeNode< T, Cmp > *khalikov::RBTree< T, Cmp >::fullLeft(TreeNode< T, Cmp > *node)
+{
+  while (node && node->left) {
+    node = node->left;
+  }
+  return node;
+}
+
+template< typename T, typename Cmp >
+const khalikov::TreeNode< T, Cmp > *khalikov::RBTree< T, Cmp >::fullLeft(const TreeNode< T, Cmp > *node) const
 {
   while (node && node->left) {
     node = node->left;

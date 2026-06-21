@@ -1,0 +1,23 @@
+#ifndef COMMANDS_HPP
+#define COMMANDS_HPP
+
+#include <sstream>
+#include <string>
+#include <utility>
+#include <functional>
+#include <iostream>
+#include "matrix.hpp"
+#include "RBTree.hpp"
+
+using pair_t = std::pair< std::string, khalikov::Matrix >;
+using Storage = khalikov::RBTree< pair_t, std::function< bool(const pair_t&, const pair_t&) > >;
+using cmd_t = void(*)(std::ostream &, std::istream &, Storage &);
+
+namespace khalikov {
+  const khalikov::Matrix *find(const Storage &storage, const std::string &name);
+  khalikov::Matrix *find(Storage &storage, const std::string &name);
+
+  void create(std::ostream &, std::istream &in, Storage &storage);
+}
+
+#endif

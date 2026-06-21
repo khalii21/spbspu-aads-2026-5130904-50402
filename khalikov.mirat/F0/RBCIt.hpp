@@ -5,10 +5,11 @@
 
 namespace khalikov
 {
-  template < class T, class Cmp > struct RBCIt
+  template < class T, class Cmp >
+  struct RBCIt
   {
     RBCIt();
-    explicit RBCIt(TreeNode< T, Cmp > *node);
+    explicit RBCIt(const TreeNode< T, Cmp > *node);
 
     const T &operator*() const;
     const T *operator->() const;
@@ -20,7 +21,7 @@ namespace khalikov
     RBCIt operator++(int);
 
   private:
-    TreeNode< T, Cmp > *curr;
+    const TreeNode< T, Cmp > *curr;
   };
 }
 
@@ -30,7 +31,7 @@ khalikov::RBCIt< T, Cmp >::RBCIt():
 {}
 
 template < class T, class Cmp >
-khalikov::RBCIt< T, Cmp >::RBCIt(TreeNode< T, Cmp > *node):
+khalikov::RBCIt< T, Cmp >::RBCIt(const TreeNode< T, Cmp > *node):
   curr(node)
 {}
 
